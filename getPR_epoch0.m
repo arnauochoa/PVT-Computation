@@ -1,4 +1,4 @@
-function    [pr,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
+function    [pr,pr2,pr5,pL1,pL5,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
 % getPR_epoch0:     Get the observed pseudoranges of the given epoch in the
 %                   RINEX file (fido) taken at year (given by the header).
 %                   The number of the observations in the RINEX file must
@@ -14,8 +14,7 @@ function    [pr,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
 %           TOW:    Time Of the Week (TOW). Time GPS in sec.
 %           sats:   1xNsat vector with the integer identifiers for the Nsat
 %                   satellites in view of constellation (const) at time TOW
-
-
+        
     %--     Find the next epoch in the observation file and get the
     %       corresponding Time Of the Week (TOW), the # of total satellites
     %       (for all constellations)in the epoch (Nsat), and the list of 
@@ -26,13 +25,12 @@ function    [pr,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
     else
         [TOW,Nsat,~,~,~]           =   fepoch_0(fido,year);
     end
-
     %
     %--     Get the observed C1 pseudorange at the next epoch for all the
     %       satellites of constellation (const). 
     %--
     if( vers == 2 )
-        [pr,~]                 =   getObs(fido,Nsat,Nobs,vers,const,Obs_types);
+%        [pr,pr2,pr5,pL1,pL5,sats]                  =   getObs(fido,Nsat,Nobs,vers,const,Obs_types);
         %---    Find the corresponding satellites to the given
         %       constellation in (const)
         switch const
@@ -40,6 +38,8 @@ function    [pr,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
                 let     =   'G';
             case 'GLO'
                 let     =   'R';
+            case 'GAL'
+                let     =   'E';
         end
         idx             =   strfind(sats,let);
         sats            =   str2double(sats((idx+1):(idx+2)));
@@ -47,13 +47,19 @@ function    [pr,TOW,sats]  =   getPR_epoch0(fido,year,Obs_types,Nobs,vers,const)
         pr              =   pr(idx);
         %
     else
+        
+        
+        
+        % Versión 3:::::::::::::::::::::::::::::::::::::::::::::::::::::::
         %--     Get the observed C1 pseudorange (some column of Obs) 
         %---    Get number of observations corresponding to the desired 
         %       constelation 'const'
         Nobsc           =   Nobs.(const);   
-%         [tmp,~]         =   obs_type_find(Obs_types,{const},'L1');
+%        [tmp,~]         =   obs_type_find(Obs_types,{const},'L1');
 %         colc            =   tmp.(const).C1;
-        [pr,sats]       =   getObs(fido,Nsat,Nobsc,vers,const,Obs_types);
+        [pr,pr2,pr5,pL1,pL5,sats]                  =   getObs(fido,Nsat,Nobs,vers,const,Obs_types);
+   
+    
     end
         
     %
