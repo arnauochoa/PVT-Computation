@@ -1,47 +1,70 @@
 function navFile = obtain_navFile(time)
 
-
-%% Filename build
+%% Server details
 
 GDC_server      = 'igs.bkg.bund.de/';
+root_folder_v2  = 'EUREF/obs/';
+root_folder_v3  = 'EUREF/nrt/';
+hour_delay      = 2;
 
-% RINEX station
-%rinex_station = 'bcln'; % How to make this dynamic?
-rinex_station = 'gaia'; %for nav v3.0
+%% Time-related computations
 
 % Timestamp info
-[doy, year4] = nsgpst2doyyear4(time);
+[doy, year4, hh]    = nsgpst2doyyear4(time);
+hh                  = num2str(floor(hh) - hour_delay);
 
+doy3                = doy;
 % Normalization of doy length
-while length(doy) < 3
-    doy = strcat('0', num2str(doy));
+while length(doy3) < 3
+    doy3 = strcat('0', num2str(doy));
 end
 
-% Converting year to two digits
+% Normalization of hour length
+while length(hh) < 2
+    hh = strcat('0', num2str(hh));
+end
+
+% Converting year to two digits (v2 only)
 if year4 < 2000
     year = num2str(year4 - 1900);
 else
     year = num2str(year4 - 2000);
 end
-    
+
+%% v2 only
 navtype = 'n'; %how to modify this? download all directly?
 % navtype = 'g';
 % navtype = 'd';
 
-% Filename
-nav_fn      = strcat(rinex_station, doy, '0.', year, navtype);
-navFile     = strcat('RINEX/nav/', nav_fn);
+%% About RINEX data (v3 only)
+rinex_station   = 'BCLN00ESP';
+data_source     = '_R_';
+timestamp       = strcat(num2str(year4), num2str(doy3), hh, '00');
+period          = '_01H_';
+ctype           = 'GN';
+format          = '.rnx';
+compression     = '.gz';
+
+%% Filename build (v2)
+%nav_fn      = strcat(rinex_station, doy3, '0.', year, navtype);
+%navFile     = strcat('RINEX/nav/', nav_fn);
+
+%% Filename build (v3)
+nav_fn      = strcat(rinex_station, data_source, timestamp, period, ctype, format);
+navFile     = strcat('RINEX/nav_v3/', nav_fn);
+
+
+%% Download URL(v2)
+%navURL = strcat('ftp://', GDC_server, root_folder_v2, num2str(year4), '/', doy3, '/', nav_fn, compression);
+
+%% Download URL (v3)
+navURL = strcat('ftp://', GDC_server, root_folder_v3, doy3, '/', hh, '/', nav_fn, compression);
 
 %% File download
-% v2
-navURL = strcat('ftp://', GDC_server, '/EUREF/obs_v3/', num2str(year4), '/', doy, '/', nav_fn, '.Z');
-% v3 (too few stations)
-%navURL = strcat('ftp://', GDC_server, '/EUREF/obs_3/', num2str(year4), '/', doy, '/', nav_fn, '.Z');
+urlwrite(navURL, strcat(navFile, compression));
 
-urlwrite(navURL, strcat(navFile, '.Z'));
-
-%urlwrite(navURL, strcat('RINEX/nav/', year4, doy, nav_fn, '.Z'));
-% Need to solve the folder issue
+%% Decompression
+gunzip(strcat(navFile, compression));
 
 %% Does not work; don't know why
 % ftpClient                       =   ftp(GDC_server);

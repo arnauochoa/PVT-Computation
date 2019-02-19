@@ -20,10 +20,9 @@ acq_info        = extract_info(GNSS_info);
 %-  Initialization Parameters
 %
 %--     Get ephemerides and iono information from navigation message
-%navFile          = obtain_navFile(acq_info.GPSTime);
+navFile          = obtain_navFile(acq_info.GPSTime);
 % let's guess that the nav RINEX is uncompressed correctly
-%[eph, iono] =  getNavRINEX(navFile);
-navFile = 'Rinex_v3/BCLN00ESP_R_20190440800_01H_GN.rnx';
+%navFile = 'Rinex_v3/BCLN00ESP_R_20190440800_01H_GN.rnx';
 [eph, iono] =  getNavRINEX(navFile);
 
 
@@ -104,7 +103,8 @@ rms_mean        =   sqrt(sum((PVTr - pos_mean).^2));
 % 
 % -------------------------------------------------------------------------
 fprintf('\nPosition computed:', Nepoch);
-fprintf('\n\nX: %12.3f m  Y: %12.3f m  Z: %12.3f m\n ', pos_mean(1), pos_mean(2), pos_mean(3));
+fprintf('\n\nReferenc X: %12.3f m  Y: %12.3f m  Z: %12.3f m', PVTr(1), PVTr(2), PVTr(3));
+fprintf('\nComputed X: %12.3f m  Y: %12.3f m  Z: %12.3f m\n ', pos_mean(1), pos_mean(2), pos_mean(3));
 fprintf(strcat('\nLat.: %12.3f', char(176),' Long.: %12.3f', char(176), ' Height: %12.3f m\n'), posllh_mean(1), posllh_mean(2), posllh_mean(3));
 fprintf('\nEstimated time: %G s\n', PVT(4));
 fprintf('\nTime error: %G s\n', t_err_mean);

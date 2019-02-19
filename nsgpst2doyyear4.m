@@ -1,4 +1,4 @@
-function [doy, year4] = nsgpst2doyyear4(time)
+function [doy, year4, hour] = nsgpst2doyyear4(time)
 
 
 % Some declarations
@@ -16,7 +16,7 @@ year4                   = 1980 + floor(years_passed);
 %% doy
 % + 5 days since reference starts at doy = 6 (06/01/1980 00:00) (5 days
 % from 01/01/1980 to 06/01/1980
-% - leap deays
+% - leap days
 time_corrected          = time + 5*day_seconds - (floor(bis))*day_seconds;
 last_year               = mod(time_corrected, year_seconds);
 doy                     = floor(last_year/day_seconds);

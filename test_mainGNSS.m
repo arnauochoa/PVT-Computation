@@ -12,10 +12,15 @@ switch option
 end
 
     
-%% Build struct from JSONs
+%% Build str from JSON
 json          = strcat('JSON/', json_fn);
 json_content     = load_info(json);
-[lat, long] = main_GNSS(json_content)
+
+%% Execution
+
+[lat, long] = main_GNSS(json_content);
+fprintf('\nCopy to Google:');
+fprintf('\n%12.3f, %12.3f\n', lat, long);
 
 
 
