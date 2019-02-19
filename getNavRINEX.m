@@ -291,8 +291,11 @@ function    [eph,iono]  =   getNavRINEX(NavRINEXFile)
             %freq_L2 = freq_num * 0.4375 + 1246.0;
 
             %convert GLONASS (UTC) date to GPS date
-            date_GLO = datenum([year month day hour minute second]);
-            date_GPS = utc2gpstow(date_GLO);
+            %date_GLO = datenum([year month day hour minute second]);
+            %date_GPS = utc2gpstow(date_GLO);
+            
+            %date_GLO = datenum([year month day hour minute second]);
+            date_GPS = utc2gpstow([year month day hour minute second], 0);
 
             %convert GPS date to seconds of week (used as GLONASS time-of-ephemeris)
             [week_toe, toe] = date2gps(datevec(date_GPS));

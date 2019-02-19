@@ -1,0 +1,336 @@
+{
+  "Params": {
+    "algorithm": 1,
+    "bands": [
+      1
+    ],
+    "constellations": [
+      1
+    ],
+    "corrections": [
+      1,
+      2
+    ]
+  },
+  "Location": {
+    "latitude": 41.4879993971991,
+    "longitude": 2.148522508394626,
+    "altitude": 139.59780244505816
+  },
+  "Status": [
+    {
+      "svid": 26,
+      "azimuthDegrees": 184,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 18,
+      "constellationType": 6,
+      "elevationDegrees": 80,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 11,
+      "azimuthDegrees": 310,
+      "carrierFrequencyHz": 1602000000,
+      "cn0DbHz": 27,
+      "constellationType": 3,
+      "elevationDegrees": 80,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 21,
+      "azimuthDegrees": 324,
+      "carrierFrequencyHz": 1604249984,
+      "cn0DbHz": 22,
+      "constellationType": 3,
+      "elevationDegrees": 78,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 1,
+      "azimuthDegrees": 308,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 19,
+      "constellationType": 6,
+      "elevationDegrees": 74,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 21,
+      "azimuthDegrees": 155,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 21,
+      "constellationType": 1,
+      "elevationDegrees": 65,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 31,
+      "azimuthDegrees": 230,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 25,
+      "constellationType": 1,
+      "elevationDegrees": 56,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 26,
+      "azimuthDegrees": 309,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 25,
+      "constellationType": 1,
+      "elevationDegrees": 48,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 21,
+      "azimuthDegrees": 137,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 14,
+      "constellationType": 6,
+      "elevationDegrees": 48,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 29,
+      "azimuthDegrees": 53,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 24,
+      "constellationType": 1,
+      "elevationDegrees": 42,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 12,
+      "azimuthDegrees": 325,
+      "carrierFrequencyHz": 1601437440,
+      "cn0DbHz": 14,
+      "constellationType": 3,
+      "elevationDegrees": 33,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 20,
+      "azimuthDegrees": 36,
+      "carrierFrequencyHz": 1603124992,
+      "cn0DbHz": 18,
+      "constellationType": 3,
+      "elevationDegrees": 28,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 25,
+      "azimuthDegrees": 113,
+      "carrierFrequencyHz": 1176450048,
+      "cn0DbHz": 10,
+      "constellationType": 1,
+      "elevationDegrees": 26,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 25,
+      "azimuthDegrees": 113,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 21,
+      "constellationType": 1,
+      "elevationDegrees": 26,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 16,
+      "azimuthDegrees": 303,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 15,
+      "constellationType": 1,
+      "elevationDegrees": 21,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    },
+    {
+      "svid": 5,
+      "azimuthDegrees": 49,
+      "carrierFrequencyHz": 1575449984,
+      "cn0DbHz": 23,
+      "constellationType": 1,
+      "elevationDegrees": 9,
+      "hasAlmanacData": true,
+      "hasCarrierFrequencyHz": true,
+      "hasEphemerisData": true,
+      "usedInFix": true
+    }
+  ],
+  "Meas": [
+    {
+      "svid": 12,
+      "constellationType": 3,
+      "state": 17,
+      "accumulatedDeltaRangeMeters": -2282.339750494191,
+      "accumulatedDeltaRangeState": 20,
+      "accumulatedDeltaRangeUncertaintyMeters": 3.4028234663852886E38,
+      "cn0DbHz": 21.46051025390625,
+      "multipathIndicator": 0,
+      "pseudorangeRateMetersPerSecond": -433.9086959480949,
+      "pseudorangeRateUncertaintyMetersPerSecond": 0.9849334674395855,
+      "receivedSvTimeNanos": 435222,
+      "receivedSvTimeUncertaintyNanos": 109,
+      "timeOffsetNanos": 0,
+      "hasAutomaticGainControlLevelDb": true,
+      "hasCarrierFrequencyHz": true,
+      "hasSnrInDb": false,
+      "automaticGainControlLevelDb": 57.43316650390625,
+      "carrierFrequencyHz": 1601437440
+    },
+    {
+      "svid": 11,
+      "constellationType": 3,
+      "state": 99,
+      "accumulatedDeltaRangeMeters": 1769.238141384973,
+      "accumulatedDeltaRangeState": 20,
+      "accumulatedDeltaRangeUncertaintyMeters": 3.4028234663852886E38,
+      "cn0DbHz": 25.132373809814453,
+      "multipathIndicator": 0,
+      "pseudorangeRateMetersPerSecond": 249.6730290815541,
+      "pseudorangeRateUncertaintyMetersPerSecond": 0.8218224191933752,
+      "receivedSvTimeNanos": 1738601103,
+      "receivedSvTimeUncertaintyNanos": 81,
+      "timeOffsetNanos": 0,
+      "hasAutomaticGainControlLevelDb": true,
+      "hasCarrierFrequencyHz": true,
+      "hasSnrInDb": false,
+      "automaticGainControlLevelDb": 57.43316650390625,
+      "carrierFrequencyHz": 1602000000
+    },
+    {
+      "svid": 21,
+      "constellationType": 3,
+      "state": 17,
+      "accumulatedDeltaRangeMeters": 890.3484689046318,
+      "accumulatedDeltaRangeState": 20,
+      "accumulatedDeltaRangeUncertaintyMeters": 3.4028234663852886E38,
+      "cn0DbHz": 17.411731719970703,
+      "multipathIndicator": 0,
+      "pseudorangeRateMetersPerSecond": 275.4447341997011,
+      "pseudorangeRateUncertaintyMetersPerSecond": 1.1669596133829767,
+      "receivedSvTimeNanos": 196774,
+      "receivedSvTimeUncertaintyNanos": 318,
+      "timeOffsetNanos": 0,
+      "hasAutomaticGainControlLevelDb": true,
+      "hasCarrierFrequencyHz": true,
+      "hasSnrInDb": false,
+      "automaticGainControlLevelDb": 57.43316650390625,
+      "carrierFrequencyHz": 1604249984
+    }
+  ],
+  "Clock": {
+    "timeNanos": 12108000000,
+    "hardwareClockDiscontinuityCount": 0,
+    "hasBiasNanos": true,
+    "hasBiasUncertaintyNanos": true,
+    "hasDriftNanosPerSecond": false,
+    "hasFullBiasNanos": true,
+    "hasLeapSecond": false,
+    "hasTimeUncertaintyNanos": false,
+    "hasDriftUncertaintyNanosPerSecond": false,
+    "biasNanos": 0,
+    "biasUncertaintyNanos": 3000003672,
+    "fullBiasNanos": -1233953179734004223
+  },
+  "Nav_msgs": [
+    {
+      "svid": 16,
+      "type": 257,
+      "status": 1,
+      "messageId": -1,
+      "submessageId": 3,
+      "data": "[34, -61, -8, 13, 12, -35, -117, -77, 63, -1, 96, 99, 7, 126, 83, -99, 0, 23, -54, 47, 7, -124, 31, -54, 8, -5, 5, 103, 58, 81, 31, 83, 63, -23, -110, 86, 4, 60, 66, 83]"
+    },
+    {
+      "svid": 100,
+      "type": 769,
+      "status": 1,
+      "messageId": -1,
+      "submessageId": 7,
+      "data": "[63, 104, -45, 95, 90, 52, -65, -70, -76, 1, 40]"
+    },
+    {
+      "svid": 104,
+      "type": 769,
+      "status": 1,
+      "messageId": -1,
+      "submessageId": 2,
+      "data": "[16, -37, 0, -99, 47, -60, 98, 97, -50, -33, -64]"
+    },
+    {
+      "svid": 106,
+      "type": 769,
+      "status": 1,
+      "messageId": -1,
+      "submessageId": 13,
+      "data": "[105, 55, -111, 78, 101, 116, -65, -109, -126, 35, 96]"
+    },
+    {
+      "svid": 26,
+      "type": 257,
+      "status": 1,
+      "messageId": 21,
+      "submessageId": 4,
+      "data": "[34, -61, -8, 13, 12, -34, 76, -61, 30, 66, -3, 55, 8, -69, -92, -44, 48, 40, 26, -80, 17, 88, -13, -14, 36, 3, -9, 123, 61, 59, 0, 75, 0, 121, 45, -56, 31, 42, 99, -61]"
+    },
+    {
+      "svid": 29,
+      "type": 257,
+      "status": 1,
+      "messageId": -1,
+      "submessageId": 3,
+      "data": "[34, -61, -8, 13, 12, -34, 43, 127, 63, -4, -86, -120, 56, -39, -15, 16, 63, -1, -54, 6, 8, -12, 126, -123, 6, -99, 78, -49, 7, 36, 33, 69, 63, -22, -51, 104, 13, -2, -27, 7]"
+    },
+    {
+      "svid": 31,
+      "type": 257,
+      "status": 1,
+      "messageId": 21,
+      "submessageId": 4,
+      "data": "[34, -61, -8, 13, 12, -34, 76, -61, 30, 66, -3, 55, 8, -69, -92, -44, 48, 40, 26, -80, 17, 88, -13, -14, 36, 3, -9, 123, 61, 59, 0, 75, 0, 121, 45, -56, 0, 37, -83, -93]"
+    }
+  ]
+}

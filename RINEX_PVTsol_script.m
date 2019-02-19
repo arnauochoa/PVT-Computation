@@ -12,6 +12,7 @@ addpath 'Corrections/Prop_Effects';
 addpath 'Ephemeris';
 addpath 'Misc';
 addpath 'Observations';
+addpath 'JSON';
 
 %-  Setting Parameters
 %--     Enable/disable plots
@@ -27,11 +28,11 @@ if strcmp(const, 'GLO'), NavFile = 'RINEX/BCLN287A.18G'; end
 %--     Observation RINEX file
 ObsFile     =   'RINEX/BCLN00ESP_R_20182870000_01D_30S_MO.rnx';
 %--     Number of epochs to be analyzed (max. 2880)
-Nepoch      =   2880;                
+Nepoch      =   1;                
 %--     Number of unknowns of the PVT solution
 Nsol        =   4;                  
 %--     Number of iterations used to obtain the PVT solution
-Nit         =   20;                   
+Nit         =   10;                   
 %--     Reference position (check RINEX file or website of the station)
 PVTr        =   [4788065.1430, 167551.1700, 4196354.9920];   %FIXME: add reference time
 %--     Preliminary guess for PVT solution 

@@ -1,4 +1,4 @@
-function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(pr, svn, TOW, eph, iono, Nit, PVT0, enab_corr)
+function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr)
 % PVT_recLS:    Computation of the receiver position at time TOW from  
 %               pseudoranges (pr) and ephemerides information (eph). 
 %               Implementation using the iterative Least-Squares principle 
@@ -30,7 +30,16 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(pr, svn, TOW, eph, iono, Ni
 %                   Mainly ionosphere and troposphere corrections
 %                   
 %
+pr = [];
+svn = [];
+
+    for i=1:length(acq_info.SV.GPS)
+        pr = [pr acq_info.SV.GPS(i).p];
+        svn = [svn acq_info.SV.GPS(i).svid];
+    end
+        
     %-  Initialize parameters
+    TOW     =   acq_info.TOW;
     c       =   299792458;       %   Speed of light (m/s)
     Nsat    =   length(pr);      %   Number of satellites
     tcorr   =   zeros(Nsat, 1);  %   Satellite clock corrections    
