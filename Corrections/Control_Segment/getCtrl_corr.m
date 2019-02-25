@@ -38,7 +38,7 @@ function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
     %
     %--     Get the satellite relativistic clock correction
     trel        =   -2 * ( dot(X, vel) / (c^2) ); % IS-GPS-200E, p. 86
-  
+
     %
     %--     Account for the relativistic effect on the satellite clock bias
     %       and the time of transmission

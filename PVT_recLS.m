@@ -1,4 +1,4 @@
-function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr)
+function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr, flags)
 % PVT_recLS:    Computation of the receiver position at time TOW from  
 %               pseudoranges (pr) and ephemerides information (eph). 
 %               Implementation using the iterative Least-Squares principle 
@@ -30,13 +30,33 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(acq_info, eph, iono, Nit, P
 %                   Mainly ionosphere and troposphere corrections
 %                   
 %
-pr = [];
-svn = [];
+pr          = [];
+svn         = [];
+emptysat    = [];
 
+if flags.constellations.GPS
     for i=1:length(acq_info.SV.GPS)
-        pr = [pr acq_info.SV.GPS(i).p];
-        svn = [svn acq_info.SV.GPS(i).svid];
+        pr      =   [pr acq_info.SV.GPS(i).p];
+        svn     =   [svn acq_info.SV.GPS(i).svid];
     end
+    
+    % Have to delete de duplicated satellites?
+%     svn         =   (unique(svn', 'rows'))';
+%     pr          =   pr(1:length(svn));
+    
+end
+
+if flags.constellations.Galileo
+    for i=1:length(acq_info.SV.Galileo)
+        pr      =   [pr acq_info.SV.Galileo(i).p];
+        svn     =   [svn acq_info.SV.Galileo(i).svid];
+    end
+    
+    % Have to delete de duplicated satellites?
+%     svn         =   (unique(svn', 'rows'))';
+%     pr          =   pr(1:length(svn));
+    
+end
         
     %-  Initialize parameters
     TOW     =   acq_info.TOW;
@@ -82,7 +102,7 @@ svn = [];
             end
             pr_c          =   pr(sat) + corr;   %   Corrected pseudorange
             % pr_if = iono_corr(pr_c1, pr_c2);
-    
+
             if (~isnan(pr_c))    % Fill as long as there is C1 measurement,
                                  % otherwise discard the measurement.
                 %--     Fill the measurement vector (rhoc_i - d0_i)
@@ -97,6 +117,16 @@ svn = [];
                 % 
             end
         end
+%         for i=1:length(A)
+%             if A(i,:) == 0
+%                 emptysat = [emptysat i];
+%             end
+%         end
+%         for i=1:length(emptysat)
+%            A(emptysat(i),:) = [];
+%            p(emptysat(i))   = [];
+%            emptysat         = []; 
+%         end
         %--     Get the LS estimate of PVT at iteration iter
         d               =   pinv(A) * p;         % PVT update ("correction") !!!
         PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.

@@ -1,4 +1,4 @@
-function navFile = obtain_navFile(time)
+function navFile = obtain_navFile(time, flags)
 
 %% Server details
 
@@ -41,9 +41,16 @@ rinex_station   = 'BCLN00ESP';
 data_source     = '_R_';
 timestamp       = strcat(num2str(year4), num2str(doy3), hh, '00');
 period          = '_01H_';
-ctype           = 'GN';
 format          = '.rnx';
 compression     = '.gz';
+
+%% System/s used
+if flags.constellations.GPS
+    ctype           = 'GN';
+end
+if flags.constellations.Galileo
+    ctype           = 'EN';
+end
 
 %% Filename build (v2)
 %nav_fn      = strcat(rinex_station, doy3, '0.', year, navtype);
