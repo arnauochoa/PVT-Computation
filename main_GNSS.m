@@ -21,76 +21,37 @@ else
     system   =   'Galileo'; 
 end
 
-%% It is needed to download a navigation message to obtain ephemerides
-% since they nav_msg is not always available
-%-  Initialization Parameters
-%
-%--     Get ephemerides and iono information from navigation message
-%navFile         = obtain_navFile(acq_info.nsGPSTime, acq_info.flags);
-% let's guess that the nav RINEX is uncompressed correctly
-%navFile = 'Rinex_v3/BCLN00ESP_R_20190440800_01H_GN.rnx';
-%[eph, iono]     =   getNavRINEX(navFile);
-
-%% Another option is to transform ephData into the matrix getNavRINEX returns
-
-[eph, iono]     =   getEphMatrix(acq_info.SV, acq_info.flags)
+%% Transform ephData into the matrix getNavRINEX returns
+[eph, iono]     =   getEphMatrix(acq_info.SV, acq_info.flags);
 
 
-%% Some initialitations
-
-Nepoch       = 1;
-%--     Number of unknowns of the PVT solution
-Nsol        =   4;                  
+%% Some initialitations      
 %--     Number of iterations used to obtain the PVT solution
 Nit         =   10;                   
-%--     Reference position (check RINEX file or website of the station)
-PVTr        =   acq_info.refLocation.XYZ;   %FIXME: add reference time
 %--     Preliminary guess for PVT solution 
 PVT0        =   acq_info.refLocation.XYZ;         % TODO: get preliminay guess, from obs header?
 %--     Speed of light (for error calculations)
 c           =   299792458;       %   Speed of light (m/s)
-%--     Number of satellites for every epoch
-Nsat        =   zeros(Nepoch, 1);
-%--     Time corrections mean for every epoch
-Tcorr        =   zeros(Nepoch, 1);
-%--     Propagation corrections mean for every epoch
-Pcorr        =   zeros(Nepoch, 1);
 
 enab_corr    = 1;
 
-%
-PVT         =   nan(Nepoch,Nsol);       %   PVT solution
-GDOP        =   zeros(Nepoch,1);        %   Gdop
-PDOP        =   zeros(Nepoch,1);        %   Pdop
-TOW         =   nan(Nepoch,1);          %   Time Of the Week (TOW)
-G           =   cell(1, Nepoch);        %   Array of geometry matrixes as cells
-pos_llh     =   nan(Nepoch, 3);         %   Position in Latitude, Longitude and Height
+%--     Compute the PVT solution at the next epoch
+PVT     =  PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr, acq_info.flags);
 
+pos_llh = xyz2llh(PVT);     % Getting position in Latitude, Longitude, Height format
+pos_llh(1) = rad2deg(pos_llh(1));
+pos_llh(2) = rad2deg(pos_llh(2));
 
-for epoch = 1:Nepoch    
-    %--     Compute the PVT solution at the next epoch
-    [PVT(epoch, :), A, Tcorr(epoch), Pcorr(epoch), X]  = ...
-        PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr, acq_info.flags);
-    
-    G{epoch}          = inv(A'*A);      % Geometry matrix computation
-    
-    G_diag= diag(G{epoch});
-    GDOP(epoch) = sqrt(sum(G_diag));
-    PDOP(epoch) = sqrt(G_diag(1) + G_diag(2) + G_diag(3));
-    
-    
-    pos_llh(epoch, :) = xyz2llh(PVT(epoch, :));     % Getting position in Latitude, Longitude, Height format
-    pos_llh(epoch, 1) = rad2deg(pos_llh(epoch, 1));
-    pos_llh(epoch, 2) = rad2deg(pos_llh(epoch, 2));
-    
-    %--     Update the initial guess for the next epoch
-    PVT0 = PVT(epoch, :);
-    %
-end
+%% Return parameters
+
+latitude    = pos_llh(1);
+longitude   = pos_llh(2);
 
 %
-%
+%% IMPORTANT!!! DO NOT ADD THIS TO C++
 %-  Show results
+%--     Reference position (check RINEX file or website of the station)
+PVTr        =   acq_info.refLocation.XYZ;   %FIXME: add reference time
 
 fprintf(' ==== RESULTS ==== \n')
 Nmov            =   20;
@@ -127,9 +88,4 @@ fprintf(strcat('3D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2 +
 %fprintf('\nstd (m) of each position coordinate:');
 %fprintf('\nX: %2.2f Y: %2.2f Z:%2.2f\n', spread(1), spread(2), spread(3));
 % -------------------------------------------------------------------------
-
-%% Return parameters
-
-latitude    = posllh_mean(1);
-longitude   = posllh_mean(2);
 end
