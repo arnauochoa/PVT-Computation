@@ -33,7 +33,7 @@ end
 
 %% Another option is to transform ephData into the matrix getNavRINEX returns
 
-[eph, iono]     =   getEphMatrix(acq_info.SV, acq_info.flags)
+[eph]     =   getEphMatrix(acq_info.SV, acq_info.flags);
 
 
 %% Some initialitations
@@ -66,11 +66,16 @@ TOW         =   nan(Nepoch,1);          %   Time Of the Week (TOW)
 G           =   cell(1, Nepoch);        %   Array of geometry matrixes as cells
 pos_llh     =   nan(Nepoch, 3);         %   Position in Latitude, Longitude and Height
 
+%% Adding or substracting
+
+if ~acq_info.flags.corrections.ionoProto
+    acq_info.ionoProto = zeros(8, 1);
+end
 
 for epoch = 1:Nepoch    
     %--     Compute the PVT solution at the next epoch
     [PVT(epoch, :), A, Tcorr(epoch), Pcorr(epoch), X]  = ...
-        PVT_recLS(acq_info, eph, iono, Nit, PVT0, enab_corr, acq_info.flags);
+        PVT_recLS(acq_info, eph, acq_info.ionoProto, Nit, PVT0, enab_corr, acq_info.flags);
     
     G{epoch}          = inv(A'*A);      % Geometry matrix computation
     

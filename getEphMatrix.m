@@ -1,4 +1,4 @@
-function [eph, iono]    =   getEphMatrix(SVinfo, flags)
+function [eph]    =   getEphMatrix(SVinfo, flags)
 
 %% GPS
 if flags.constellations.GPS
@@ -63,9 +63,5 @@ if flags.constellations.Galileo
         eph(22, i)      =   Galileo(i).tgdS;
     end
 end
-
-%% Results
-
-iono =  [0 0 0 0 0 0 0 0]';
 
 end

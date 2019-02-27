@@ -4,14 +4,14 @@ function acq_info = extract_info(GNSS_info)
 
 %% Initial declarations
 
-acq_info.SV_list.SVlist_GPS     = [];
-acq_info.SV_list.SVlist_SBAS    = [];
-acq_info.SV_list.SVlist_GLONASS = [];
-acq_info.SV_list.SVlist_QZSS    = [];
-acq_info.SV_list.SVlist_BEIDOU  = [];
-acq_info.SV_list.SVlist_Galileo = [];
-acq_info.SV_list.SVlist_UNK     = [];
-c                               =   299792458;
+acq_info.SV_list.SVlist_GPS         =   [];
+acq_info.SV_list.SVlist_SBAS        =   [];
+acq_info.SV_list.SVlist_GLONASS     =   [];
+acq_info.SV_list.SVlist_QZSS        =   [];
+acq_info.SV_list.SVlist_BEIDOU      =   [];
+acq_info.SV_list.SVlist_Galileo     =   [];
+acq_info.SV_list.SVlist_UNK         =   [];
+c                                   =   299792458;
 
 %% Flags
 acq_info.flags      =   GNSS_info.Params;
@@ -202,6 +202,7 @@ for i=1:length(GNSS_info.ephData.GPS)
             acq_info.SV.GPS(j).keplerModel.omegaDot         =   GNSS_info.ephData.GPS(i).keplerModel.omegaDot;
             acq_info.SV.GPS(j).keplerModel.sqrtA            =   GNSS_info.ephData.GPS(i).keplerModel.sqrtA;
             acq_info.SV.GPS(j).keplerModel.toeS             =   GNSS_info.ephData.GPS(i).keplerModel.toeS;
+            
         end
     end
 end
@@ -234,6 +235,7 @@ for i=1:length(GNSS_info.ephData.Galileo)
             acq_info.SV.Galileo(j).keplerModel.omegaDot         =   GNSS_info.ephData.Galileo(i).keplerModel.omegaDot;
             acq_info.SV.Galileo(j).keplerModel.sqrtA            =   GNSS_info.ephData.Galileo(i).keplerModel.sqrtA;
             acq_info.SV.Galileo(j).keplerModel.toeS             =   GNSS_info.ephData.Galileo(i).keplerModel.toeS;
+             
         end
     end
 end
@@ -250,8 +252,7 @@ for i=1:length(GNSS_info.ephData.GLONASS)
 end
 
 % ionoProto
-
-
+acq_info.ionoProto                        =   [GNSS_info.ephData.ionoProto.alpha_; GNSS_info.ephData.ionoProto.beta_];
 
 %% Number of total SV
 acq_info.SVs = nGPS + nSBAS + nGLONASS + nQZSS + nBEIDOU + nGalileo + nUNK;
