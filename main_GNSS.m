@@ -15,15 +15,25 @@ GNSS_info       = jsondecode(json_content);
 %% Create acquisition struct from GNSS_info
 acq_info        = extract_info(GNSS_info);
 
+if acq_info.flags.constellations.GPS
+    system  =   'GPS';
+else
+    system   =   'Galileo'; 
+end
+
 %% It is needed to download a navigation message to obtain ephemerides
 % since they nav_msg is not always available
 %-  Initialization Parameters
 %
 %--     Get ephemerides and iono information from navigation message
-navFile          = obtain_navFile(acq_info.nsGPSTime, acq_info.flags);
+%navFile         = obtain_navFile(acq_info.nsGPSTime, acq_info.flags);
 % let's guess that the nav RINEX is uncompressed correctly
 %navFile = 'Rinex_v3/BCLN00ESP_R_20190440800_01H_GN.rnx';
-[eph, iono] =  getNavRINEX(navFile);
+%[eph, iono]     =   getNavRINEX(navFile);
+
+%% Another option is to transform ephData into the matrix getNavRINEX returns
+
+[eph, iono]     =   getEphMatrix(acq_info.SV, acq_info.flags)
 
 
 %% Some initialitations
@@ -47,8 +57,6 @@ Tcorr        =   zeros(Nepoch, 1);
 Pcorr        =   zeros(Nepoch, 1);
 
 enab_corr    = 1;
-
-%% To check
 
 %
 PVT         =   nan(Nepoch,Nsol);       %   PVT solution
@@ -102,7 +110,7 @@ rms             =   sqrt((PVTr(1) - PVT(:,1)).^2 + (PVTr(2) - PVT(:,2)).^2 + (PV
 rms_mean        =   sqrt(sum((PVTr - pos_mean).^2));
 % 
 % -------------------------------------------------------------------------
-fprintf('\nPosition computed:', Nepoch);
+fprintf('\nPosition computed using %s:', system);
 fprintf('\n\nReferenc X: %f m  Y: %f m  Z: %f m', PVTr(1), PVTr(2), PVTr(3));
 fprintf('\nComputed X: %f m  Y: %f m  Z: %f m\n ', pos_mean(1), pos_mean(2), pos_mean(3));
 fprintf(strcat('\nLat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), posllh_mean(1), posllh_mean(2), posllh_mean(3));
@@ -110,7 +118,11 @@ fprintf('\nEstimated time: %G s\n', PVT(4));
 fprintf('\nTime error: %G s\n', t_err_mean);
 fprintf('\nPosition error:');
 fprintf('\nX: %f m Y: %f m Z:%f m', p_err_mean(1), p_err_mean(2), p_err_mean(3));
-fprintf(strcat('\nLat: %f', char(176), ' Long: %f', char(176), ' Height: %f m \n'), p_err_mean_llh(1), p_err_mean_llh(2), p_err_mean_llh(3));
+fprintf(strcat('\nLat: %f', char(176), ' Long: %f', char(176), ' Height: %f m \n\n'), p_err_mean_llh(1), p_err_mean_llh(2), p_err_mean_llh(3));
+
+fprintf(strcat('2D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2));
+fprintf(strcat('3D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2 + (p_err_mean(3))^2));
+
 %fprintf('\nRMS in position as computed from mean position: %2.2f m \n', rms_mean);
 %fprintf('\nstd (m) of each position coordinate:');
 %fprintf('\nX: %2.2f Y: %2.2f Z:%2.2f\n', spread(1), spread(2), spread(3));

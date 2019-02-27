@@ -15,24 +15,11 @@ switch option
         json_fn         = 'JSON_modificado.rnx';
 end
 
-    
 %% Build str from JSON
 json            = strcat('JSON/', json_fn);
 json_content    = load_info(json);
 
 %% Execution
-
-flags.GPS       =   1;
-flags.Galileo   =   0;
-flags.GLONASS   =   0;
-flags.QZSS      =   0;
-flags.UNK       =   0;
-flags.BEIDOU    =   0;
-flags.SBAS      =   0;
-
-flags.LS        =   1;
-flags.WLS       =   0;
-flags.Kalman    =   0;
 
 [lat, long] = main_GNSS(json_content);
 fprintf('\nCopy to Google:');
