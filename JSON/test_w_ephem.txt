@@ -10,12 +10,11 @@
       "L5": false
     },
     "corrections": {
-      "ionosphere": true,
-      "troposphere": true,
+      "ionosphere": false,
+      "troposphere": false,
       "multipath": false,
       "PPP": false,
-      "camera": false,
-      "ionoProto": false
+      "camera": false
     },
     "algorithm": {
       "LS": true,

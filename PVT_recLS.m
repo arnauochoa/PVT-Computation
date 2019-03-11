@@ -32,18 +32,12 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS(acq_info, eph, iono, Nit, P
 %
 pr          = [];
 svn         = [];
-emptysat    = [];
 
 if flags.constellations.GPS
     for i=1:length(acq_info.SV.GPS)
         pr      =   [pr acq_info.SV.GPS(i).p];
         svn     =   [svn acq_info.SV.GPS(i).svid];
-    end
-    
-    % Have to delete de duplicated satellites?
-%     svn         =   (unique(svn', 'rows'))';
-%     pr          =   pr(1:length(svn));
-    
+    end    
 end
 
 if flags.constellations.Galileo
@@ -51,11 +45,6 @@ if flags.constellations.Galileo
         pr      =   [pr acq_info.SV.Galileo(i).p];
         svn     =   [svn acq_info.SV.Galileo(i).svid];
     end
-    
-    % Have to delete de duplicated satellites?
-%     svn         =   (unique(svn', 'rows'))';
-%     pr          =   pr(1:length(svn));
-    
 end
         
     %-  Initialize parameters
@@ -117,6 +106,25 @@ end
                 % 
             end
         end
+
+        %--     Get the LS estimate of PVT at iteration iter
+        d               =   pinv(A) * p;         % PVT update ("correction") !!!
+        PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
+        PVT(4)          =   d(4);        % Update receiver clock offset
+        %
+    end
+    tcorr = mean(tcorr);
+    Pcorr = mean(Pcorr);
+end
+
+%% Test code
+
+    % Have to delete de duplicated satellites?
+%     svn         =   (unique(svn', 'rows'))';
+%     pr          =   pr(1:length(svn));
+
+%         emptysat    = [];
+    % Delete rows of 0s
 %         for i=1:length(A)
 %             if A(i,:) == 0
 %                 emptysat = [emptysat i];
@@ -127,12 +135,3 @@ end
 %            p(emptysat(i))   = [];
 %            emptysat         = []; 
 %         end
-        %--     Get the LS estimate of PVT at iteration iter
-        d               =   pinv(A) * p;         % PVT update ("correction") !!!
-        PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
-        PVT(4)          =   d(4);        % Update receiver clock offset
-        %
-    end
-    tcorr = mean(tcorr);
-    Pcorr = mean(Pcorr);
-end

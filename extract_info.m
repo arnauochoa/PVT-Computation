@@ -29,71 +29,6 @@ end
 acq_info.TOW    = tow;
 acq_info.NOW    = now;
 
-%% Status
-
-% for i=1:length(GNSS_info.Status)
-% 
-%     switch GNSS_info.Status(i).constellationType
-%         case 1
-%             acq_info.SV_list.SVlist_GPS                                                 = [acq_info.SV_list.SVlist_GPS GNSS_info.Status(i).svid];
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).svid                   = GNSS_info.Status(i).svid;
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).CN0                    = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).Azimuth                = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).Elevation              = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).CarrierFreq            = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.GPS(length(acq_info.SV_list.SVlist_GPS)).OK                     = GNSS_info.Status(i).hasEphemerisData;
-%         case 2
-%             acq_info.SV_list.SVlist_SBAS                                                = [acq_info.SV_list.SVlist_SBAS GNSS_info.Status(i).svid];
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAS)).svid                 = GNSS_info.Status(i).svid;
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAS)).CN0                  = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAS)).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAS)).Elevation            = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAS)).CarrierFreq          = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.SBAS(length(acq_info.SV_list.SVlist_SBAD)).OK                   = GNSS_info.Status(i).hasEphemerisData;
-%         case 3
-%             acq_info.SV_list.SVlist_GLONASS                                             = [acq_info.SV_list.SVlist_GLONASS GNSS_info.Status(i).svid];
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).svid           = GNSS_info.Status(i).svid;
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).CN0            = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).Azimuth        = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).Elevation      = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).CarrierFreq    = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.GLONASS(length(acq_info.SV_list.SVlist_GLONASS)).OK             = GNSS_info.Status(i).hasEphemerisData;
-%         case 4
-%             acq_info.SV_list.SVlist_QZSS                                                = [acq_info.SV_list.SVlist_QZSS GNSS_info.Status(i).svid];
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).svid                 = GNSS_info.Status(i).svid;
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).CN0                  = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).Elevation            = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).CarrierFreq          = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.QZSS(length(acq_info.SV_list.SVlist_QZSS)).OK                   = GNSS_info.Status(i).hasEphemerisData;
-%         case 5
-%             acq_info.SV_list.SVlist_BEIDOU                                              = [acq_info.SV_list.SVlist_BEIDOU GNSS_info.Status(i).svid];
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).svid             = GNSS_info.Status(i).svid;
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).CN0              = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).Elevation        = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).CarrierFreq      = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.BEIDOU(length(acq_info.SV_list.SVlist_BEIDOU)).OK               = GNSS_info.Status(i).hasEphemerisData;
-%         case 6
-%             acq_info.SV_list.SVlist_Galileo                                             = [acq_info.SV_list.SVlist_Galileo GNSS_info.Status(i).svid];
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).svid           = GNSS_info.Status(i).svid;
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).CN0            = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).Azimuth        = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).Elevation      = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).CarrierFreq    = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.Galileo(length(acq_info.SV_list.SVlist_Galileo)).OK          	= GNSS_info.Status(i).hasEphemerisData;
-%         otherwise
-%             acq_info.SV_list.SVlist_UNK                                                 = [acq_info.SV_list.SVlist_UNK GNSS_info.Status(i).svid];
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).svid                   = GNSS_info.Status(i).svid;
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).CN0                    = GNSS_info.Status(i).cn0DbHz;
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).Azimuth                = GNSS_info.Status(i).azimuthDegrees;
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).Elevation              = GNSS_info.Status(i).elevationDegrees;
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).CarrierFreq            = GNSS_info.Status(i).carrierFrequencyHz;
-%             acq_info.SV.UNK(length(acq_info.SV_list.SVlist_UNK)).OK                     = GNSS_info.Status(i).hasEphemerisData;
-%     end
-% 
-% end
-
 %% Measurements
 
 nGPS        =   1;
@@ -108,14 +43,18 @@ for i=1:length(GNSS_info.Meas)
 
     switch GNSS_info.Meas(i).constellationType
         case 1
+            acq_info.SV_list.SVlist_GPS                     =   [acq_info.SV_list.SVlist_GPS GNSS_info.Meas(i).svid];
             acq_info.SV.GPS(nGPS).svid                      =   GNSS_info.Meas(i).svid;
             acq_info.SV.GPS(nGPS).carrierFreq               =   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.GPS(nGPS).t_tx                      =   GNSS_info.Meas(i).receivedSvTimeNanos;
             acq_info.SV.GPS(nGPS).pseudorangeRate           =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
             acq_info.SV.GPS(nGPS).CN0                       =   GNSS_info.Meas(i).cn0DbHz;
+            acq_info.SV.GPS(nGPS).phase                     =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+            acq_info.SV.GPS(nGPS).phaseState                =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
             acq_info.SV.GPS(nGPS).p                         =   pseudo_gen(acq_info.SV.GPS(nGPS).t_tx, tow, c);
             nGPS                                            =   nGPS + 1;
         case 2
+            acq_info.SV_list.SVlist_SBAS                    =   [acq_info.SV_list.SVlist_SBAS GNSS_info.Meas(i).svid];
             acq_info.SV.SBAS(nSBAS).svid                    =   GNSS_info.Meas(i).svid;
             acq_info.SV.SBAS(nSBAS).carrierFreq             =   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.SBAS(nSBAS).t_tx                    =   GNSS_info.Meas(i).receivedSvTimeNanos;
@@ -123,6 +62,7 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.SBAS(nSBAS).CN0                     =   GNSS_info.Meas(i).cn0DbHz;
             nSBAS                                           =   nSBAS + 1;
         case 3
+            acq_info.SV_list.SVlist_GLONASS             	=   [acq_info.SV_list.SVlist_GLONASS GNSS_info.Meas(i).svid];
             acq_info.SV.GLONASS(nGLONASS).svid           	=   GNSS_info.Meas(i).svid;
             acq_info.SV.GLONASS(nGLONASS).carrierFreq     	=   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.GLONASS(nGLONASS).t_tx              =   GNSS_info.Meas(i).receivedSvTimeNanos;
@@ -130,6 +70,7 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.GLONASS(nGLONASS).CN0               =   GNSS_info.Meas(i).cn0DbHz;
             nGLONASS                                        =   nGLONASS + 1;
         case 4
+            acq_info.SV_list.SVlist_QZSS                    =   [acq_info.SV_list.SVlist_QZSS GNSS_info.Meas(i).svid];
             acq_info.SV.QZSS(nQZSS).svid                    =   GNSS_info.Meas(i).svid;
             acq_info.SV.QZSS(nQZSS).carrierFreq             =   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.QZSS(nQZSS).t_tx                    =   GNSS_info.Meas(i).receivedSvTimeNanos;
@@ -138,6 +79,7 @@ for i=1:length(GNSS_info.Meas)
             nQZSS                                           =   nQZSS + 1;
 
         case 5
+            acq_info.SV_list.SVlist_BEIDOU                  =   [acq_info.SV_list.SVlist_BEIDOU GNSS_info.Meas(i).svid];
             acq_info.SV.BEIDOU(nBEIDOU).svid                =   GNSS_info.Meas(i).svid;
             acq_info.SV.BEIDOU(nBEIDOU).carrierFreq      	=   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.BEIDOU(nBEIDOU).t_tx                =   GNSS_info.Meas(i).receivedSvTimeNanos;
@@ -145,14 +87,18 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.BEIDOU(nBEIDOU).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
             nBEIDOU                                         =   nBEIDOU + 1;
         case 6
+            acq_info.SV_list.SVlist_Galileo          	    =   [acq_info.SV_list.SVlist_Galileo GNSS_info.Meas(i).svid];
             acq_info.SV.Galileo(nGalileo).svid           	=   GNSS_info.Meas(i).svid;
             acq_info.SV.Galileo(nGalileo).carrierFreq    	=   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.Galileo(nGalileo).t_tx              =   GNSS_info.Meas(i).receivedSvTimeNanos;
             acq_info.SV.Galileo(nGalileo).pseudorangeRate   =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
             acq_info.SV.Galileo(nGalileo).CN0               =   GNSS_info.Meas(i).cn0DbHz;
+            acq_info.SV.Galileo(nGalileo).phase             =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+            acq_info.SV.Galileo(nGalileo).phaseState        =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
             acq_info.SV.Galileo(nGalileo).p                 =   pseudo_gen(acq_info.SV.Galileo(nGalileo).t_tx, tow, c);
             nGalileo                                        =   nGalileo + 1;
         otherwise
+            acq_info.SV_list.SVlist_UNK                     =   [acq_info.SV_list.SVlist_UNK GNSS_info.Meas(i).svid];
             acq_info.SV.UNK(nUNK).svid                      =   GNSS_info.Meas(i).svid;
             acq_info.SV.UNK(nUNK).carrierFreq               =   GNSS_info.Meas(i).carrierFrequencyHz;
             acq_info.SV.UNK(nUNK).t_tx                      =   GNSS_info.Meas(i).receivedSvTimeNanos;
@@ -170,6 +116,72 @@ nQZSS       =   nQZSS - 1;
 nBEIDOU     =   nBEIDOU - 1;
 nGalileo    =   nGalileo - 1;
 nUNK        =   nUNK - 1;
+
+%% Status
+
+for i=1:length(GNSS_info.Status)
+
+    switch GNSS_info.Status(i).constellationType
+        case 1
+            for j=1:length(acq_info.SV_list.SVlist_GPS)
+                if acq_info.SV.GPS(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.GPS(j).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.GPS(j).Elevation            = GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.GPS(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        case 2
+            for j=1:length(acq_info.SV_list.SVlist_SBAS)
+                if acq_info.SV.SBAS(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.SBAS(j).Azimuth             = GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.SBAS(j).Elevation       	= GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.SBAS(j).OK                	= GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        case 3
+            for j=1:length(acq_info.SV_list.SVlist_GLONASS)
+                if acq_info.SV.GLONASS(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.GLONASS(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.GLONASS(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.GLONASS(j).OK               = GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        case 4
+            for j=1:length(acq_info.SV_list.SVlist_QZSS)
+                if acq_info.SV.QZSS(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.QZSS(j).Azimuth         	= GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.QZSS(j).Elevation        	= GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.QZSS(j).OK               	= GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        case 5
+            for j=1:length(acq_info.SV_list.SVlist_BEIDOU)
+                if acq_info.SV.BEIDOU(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.BEIDOU(j).Azimuth           = GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.BEIDOU(j).Elevation         = GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.BEIDOU(j).OK                = GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        case 6
+            for j=1:length(acq_info.SV_list.SVlist_Galileo)
+                if acq_info.SV.Galileo(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.Galileo(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.Galileo(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.Galileo(j).OK               = GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+        otherwise
+            for j=1:length(acq_info.SV_list.SVlist_UNK)
+                if acq_info.SV.UNK(j).svid == GNSS_info.Meas(i).svid
+                    acq_info.SV.UNK(j).Azimuth          	= GNSS_info.Status(i).azimuthDegrees;
+                    acq_info.SV.UNK(j).Elevation         	= GNSS_info.Status(i).elevationDegrees;
+                    acq_info.SV.UNK(j).OK                 	= GNSS_info.Status(i).hasEphemerisData;
+                end
+            end
+    end
+
+  end
+
 %% SUPL information
 
 % GPS

@@ -15,10 +15,56 @@ GNSS_info       = jsondecode(json_content);
 %% Create acquisition struct from GNSS_info
 acq_info        = extract_info(GNSS_info);
 
+%% Hardcoded for testing (in order not to modify the files directly)
+
+acq_info.flags.constellations.GPS           =   0;
+acq_info.flags.constellations.Galileo       =   1;
+acq_info.flags.corrections.ionosphere       =   0;
+acq_info.flags.corrections.troposphere      =   0;
+acq_info.flags.corrections.f2corr           =   0;
+
 if acq_info.flags.constellations.GPS
     system  =   'GPS';
-else
-    system   =   'Galileo'; 
+end
+
+if acq_info.flags.constellations.Galileo
+    system   =   'Galileo';
+end
+
+if acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo
+    system   =   'GPS + Galileo';
+end
+
+%% Masks application
+mask = 0; % degrees
+
+% Elevation mask
+if 1 % mask flag
+    tmp         =   [];
+    if acq_info.flags.constellations.GPS
+        for i=1:length(acq_info.SV.GPS)
+            if acq_info.SV.GPS(i).Elevation < mask
+                tmp                     =   [tmp i]; 
+            end
+        end
+        tmp     = 	sort(tmp, 'descend');
+        for i=1:length(tmp)
+            acq_info.SV.GPS(tmp(i))   	=   [];
+        end
+    end
+    
+    tmp     =   [];
+    if acq_info.flags.constellations.Galileo
+        for i=1:length(acq_info.SV.Galileo)
+            if acq_info.SV.Galileo(i).Elevation < mask
+                tmp                     =   [tmp i];
+            end        
+        end
+        tmp     = 	sort(tmp, 'descend');
+        for i=1:length(tmp)
+            acq_info.SV.Galileo(tmp(i))	=   [];
+        end
+    end
 end
 
 %% It is needed to download a navigation message to obtain ephemerides
@@ -26,80 +72,33 @@ end
 %-  Initialization Parameters
 %
 %--     Get ephemerides and iono information from navigation message
-%navFile         = obtain_navFile(acq_info.nsGPSTime, acq_info.flags);
-% let's guess that the nav RINEX is uncompressed correctly
-%navFile = 'Rinex_v3/BCLN00ESP_R_20190440800_01H_GN.rnx';
-%[eph, iono]     =   getNavRINEX(navFile);
+% navFile         = obtain_navFile(acq_info.nsGPSTime, acq_info.flags);
+% [eph, acq_info.ionoProto]     =   getNavRINEX(navFile);
 
-%% Another option is to transform ephData into the matrix getNavRINEX returns
-
-[eph]     =   getEphMatrix(acq_info.SV, acq_info.flags);
-
+%% Another option is to transform ephData into the matrix getNavRINEX return
+eph     =   getEphMatrix(acq_info.SV, acq_info.flags);
 
 %% Some initialitations
-
-Nepoch       = 1;
-%--     Number of unknowns of the PVT solution
-Nsol        =   4;                  
-%--     Number of iterations used to obtain the PVT solution
-Nit         =   10;                   
-%--     Reference position (check RINEX file or website of the station)
-PVTr        =   acq_info.refLocation.XYZ;   %FIXME: add reference time
-%--     Preliminary guess for PVT solution 
-PVT0        =   acq_info.refLocation.XYZ;         % TODO: get preliminay guess, from obs header?
-%--     Speed of light (for error calculations)
+PVT0        =   acq_info.refLocation.XYZ;  % Preliminary guess for PVT solution     
 c           =   299792458;       %   Speed of light (m/s)
-%--     Number of satellites for every epoch
-Nsat        =   zeros(Nepoch, 1);
-%--     Time corrections mean for every epoch
-Tcorr        =   zeros(Nepoch, 1);
-%--     Propagation corrections mean for every epoch
-Pcorr        =   zeros(Nepoch, 1);
+ 
+%% Compute the PVT solution
+PVT  = PVT_recLS_multiC(acq_info, eph);
 
-enab_corr    = 1;
+pos_llh = xyz2llh(PVT);     % Getting position in Latitude, Longitude, Height format
+pos_llh(1) = rad2deg(pos_llh(1));
+pos_llh(2) = rad2deg(pos_llh(2));
 
-%
-PVT         =   nan(Nepoch,Nsol);       %   PVT solution
-GDOP        =   zeros(Nepoch,1);        %   Gdop
-PDOP        =   zeros(Nepoch,1);        %   Pdop
-TOW         =   nan(Nepoch,1);          %   Time Of the Week (TOW)
-G           =   cell(1, Nepoch);        %   Array of geometry matrixes as cells
-pos_llh     =   nan(Nepoch, 3);         %   Position in Latitude, Longitude and Height
+%% Return parameters
 
-%% Adding or substracting
+latitude    = pos_llh(1);
+longitude   = pos_llh(2);
 
-if ~acq_info.flags.corrections.ionoProto
-    acq_info.ionoProto = zeros(8, 1);
-end
-
-for epoch = 1:Nepoch    
-    %--     Compute the PVT solution at the next epoch
-    [PVT(epoch, :), A, Tcorr(epoch), Pcorr(epoch), X]  = ...
-        PVT_recLS(acq_info, eph, acq_info.ionoProto, Nit, PVT0, enab_corr, acq_info.flags);
-    
-    G{epoch}          = inv(A'*A);      % Geometry matrix computation
-    
-    G_diag= diag(G{epoch});
-    GDOP(epoch) = sqrt(sum(G_diag));
-    PDOP(epoch) = sqrt(G_diag(1) + G_diag(2) + G_diag(3));
-    
-    
-    pos_llh(epoch, :) = xyz2llh(PVT(epoch, :));     % Getting position in Latitude, Longitude, Height format
-    pos_llh(epoch, 1) = rad2deg(pos_llh(epoch, 1));
-    pos_llh(epoch, 2) = rad2deg(pos_llh(epoch, 2));
-    
-    %--     Update the initial guess for the next epoch
-    PVT0 = PVT(epoch, :);
-    %
-end
-
-%
-%
-%-  Show results
+%% Results
 
 fprintf(' ==== RESULTS ==== \n')
 Nmov            =   20;
-ref_pos_llh     =   rad2deg(xyz2llh(PVTr));
+ref_pos_llh     =   rad2deg(xyz2llh(PVT0));
 
 pos_mean        =   nanmean(PVT(:,1:3),1);
 posllh_mean     =   rad2deg(xyz2llh(pos_mean));
@@ -107,18 +106,21 @@ t_err           =   PVT(:,4)/c;
 t_err_mean      =   mean(t_err);
 mu_mov          =   movmean(PVT(:,1:3),[Nmov-1 0],1);
 spread          =   nanstd(PVT(:,1:3), 0, 1);
-p_err           =   sqrt((PVTr(1:3) - PVT(:, 1:3)).^2);
-p_err_mean      =   sqrt((PVTr(1:3) - pos_mean).^2);
+p_err           =   sqrt((PVT0(1:3) - PVT(:, 1:3)).^2);
+p_err_mean      =   sqrt((PVT0(1:3) - pos_mean).^2);
 p_err_mean_llh  =   sqrt((ref_pos_llh - posllh_mean).^2);
-p_err_mov       =   PVTr(1:3) - mu_mov;
-rms             =   sqrt((PVTr(1) - PVT(:,1)).^2 + (PVTr(2) - PVT(:,2)).^2 + (PVTr(3) - PVT(:,3)).^2);
-rms_mean        =   sqrt(sum((PVTr - pos_mean).^2));
+p_err_mov       =   PVT0(1:3) - mu_mov;
+rms             =   sqrt((PVT0(1) - PVT(:,1)).^2 + (PVT0(2) - PVT(:,2)).^2 + (PVT0(3) - PVT(:,3)).^2);
+rms_mean        =   sqrt(sum((PVT0 - pos_mean).^2));
+llhref          =   xyz2llh(PVT0);
 % 
 % -------------------------------------------------------------------------
 fprintf('\nPosition computed using %s:', system);
-fprintf('\n\nReferenc X: %f m  Y: %f m  Z: %f m', PVTr(1), PVTr(2), PVTr(3));
-fprintf('\nComputed X: %f m  Y: %f m  Z: %f m\n ', pos_mean(1), pos_mean(2), pos_mean(3));
-fprintf(strcat('\nLat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), posllh_mean(1), posllh_mean(2), posllh_mean(3));
+fprintf('\n\nReferenc X: %f m  Y: %f m  Z: %f m', PVT0(1), PVT0(2), PVT0(3));
+fprintf('\nComputed X: %f m  Y: %f m  Z: %f m\n\n', pos_mean(1), pos_mean(2), pos_mean(3));
+fprintf(strcat('Referenc Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), acq_info.refLocation.LLH(1), acq_info.refLocation.LLH(2), acq_info.refLocation.LLH(3));
+fprintf(strcat('Computed Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), posllh_mean(1), posllh_mean(2), posllh_mean(3));
+fprintf('\nReal time: %G s', acq_info.TOW);
 fprintf('\nEstimated time: %G s\n', PVT(4));
 fprintf('\nTime error: %G s\n', t_err_mean);
 fprintf('\nPosition error:');
@@ -128,13 +130,5 @@ fprintf(strcat('\nLat: %f', char(176), ' Long: %f', char(176), ' Height: %f m \n
 fprintf(strcat('2D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2));
 fprintf(strcat('3D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2 + (p_err_mean(3))^2));
 
-%fprintf('\nRMS in position as computed from mean position: %2.2f m \n', rms_mean);
-%fprintf('\nstd (m) of each position coordinate:');
-%fprintf('\nX: %2.2f Y: %2.2f Z:%2.2f\n', spread(1), spread(2), spread(3));
-% -------------------------------------------------------------------------
-
-%% Return parameters
-
-latitude    = posllh_mean(1);
-longitude   = posllh_mean(2);
+toc
 end

@@ -1,4 +1,4 @@
-function    T     =   getProp_corr(X,pos,iono,TOW)
+function    [tropoCorr, ionoCorr]     =   getProp_corr(X,pos,iono,TOW)
 % getProp_tcorr:  Get propagation effects correction.  
 %
 % Inputs:
@@ -31,8 +31,6 @@ function    T     =   getProp_corr(X,pos,iono,TOW)
     else
         ionoCorr        =   0.00001;
     end
-    %
-    T                   =   tropoCorr + ionoCorr;
 
 
 end
