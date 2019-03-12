@@ -74,36 +74,33 @@ longitude   = pos_llh(2);
 fprintf(' ==== RESULTS ==== \n')
 Nmov            =   20;
 ref_pos_llh     =   rad2deg(xyz2llh(PVT0));
+LLH0            =   xyz2llh(PVT0);
+LLH0            =   [rad2deg(LLH0(1:2)) LLH0(3)];
+LLH             =   xyz2llh(PVT);
+LLH             =   [rad2deg(LLH(1:2)) LLH(3)];
 
-pos_mean        =   nanmean(PVT(:,1:3),1);
-posllh_mean     =   rad2deg(xyz2llh(pos_mean));
-t_err           =   PVT(:,4)/c;
-t_err_mean      =   mean(t_err);
-mu_mov          =   movmean(PVT(:,1:3),[Nmov-1 0],1);
-spread          =   nanstd(PVT(:,1:3), 0, 1);
+t_err           =   acq_info.TOW - PVT(4);
 p_err           =   sqrt((PVT0(1:3) - PVT(:, 1:3)).^2);
-p_err_mean      =   sqrt((PVT0(1:3) - pos_mean).^2);
-p_err_mean_llh  =   sqrt((ref_pos_llh - posllh_mean).^2);
-p_err_mov       =   PVT0(1:3) - mu_mov;
-rms             =   sqrt((PVT0(1) - PVT(:,1)).^2 + (PVT0(2) - PVT(:,2)).^2 + (PVT0(3) - PVT(:,3)).^2);
-rms_mean        =   sqrt(sum((PVT0 - pos_mean).^2));
-llhref          =   xyz2llh(PVT0);
+p_err_llh       =   sqrt((LLH0 - LLH).^2);
+%rms             =   sqrt((PVT0(1) - PVT(:,1)).^2 + (PVT0(2) - PVT(:,2)).^2 + (PVT0(3) - PVT(:,3)).^2);
+%rms_mean        =   sqrt(sum((PVT0 - pos_mean).^2));
+%llhref          =   xyz2llh(PVT0);
 % 
 % -------------------------------------------------------------------------
 fprintf('\nPosition computed using %s:', system);
 fprintf('\n\nReferenc X: %f m  Y: %f m  Z: %f m', PVT0(1), PVT0(2), PVT0(3));
-fprintf('\nComputed X: %f m  Y: %f m  Z: %f m\n\n', pos_mean(1), pos_mean(2), pos_mean(3));
-fprintf(strcat('Referenc Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), acq_info.refLocation.LLH(1), acq_info.refLocation.LLH(2), acq_info.refLocation.LLH(3));
-fprintf(strcat('Computed Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), posllh_mean(1), posllh_mean(2), posllh_mean(3));
+fprintf('\nComputed X: %f m  Y: %f m  Z: %f m\n\n', PVT(1), PVT(2), PVT(3));
+fprintf(strcat('Referenc Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), LLH0(1), LLH0(2), LLH0(3));
+fprintf(strcat('Computed Lat.: %f', char(176),' Long.: %f', char(176), ' Height: %f m\n'), LLH(1), LLH(2), LLH(3));
 fprintf('\nReal time: %G s', acq_info.TOW);
 fprintf('\nEstimated time: %G s\n', PVT(4));
-fprintf('\nTime error: %G s\n', t_err_mean);
+fprintf('\nTime error: %G s\n', t_err);
 fprintf('\nPosition error:');
-fprintf('\nX: %f m Y: %f m Z: %f m', p_err_mean(1), p_err_mean(2), p_err_mean(3));
-fprintf(strcat('\nLat: %f', char(176), ' Long: %f', char(176), ' Height: %f m \n\n'), p_err_mean_llh(1), p_err_mean_llh(2), p_err_mean_llh(3));
+fprintf('\nX: %f m Y: %f m Z: %f m', p_err(1), p_err(2), p_err(3));
+fprintf(strcat('\nLat: %f', char(176), ' Long: %f', char(176), ' Height: %f m \n\n'), p_err_llh(1), p_err_llh(2), p_err_llh(3));
 
-fprintf(strcat('2D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2));
-fprintf(strcat('3D error: %f m\n'), sqrt((p_err_mean(1))^2 + (p_err_mean(2))^2 + (p_err_mean(3))^2));
+fprintf(strcat('2D error: %f m\n'), sqrt((p_err(1))^2 + (p_err(2))^2));
+fprintf(strcat('3D error: %f m\n'), sqrt((p_err(1))^2 + (p_err(2))^2 + (p_err(3))^2));
 end
 
 %% Test code

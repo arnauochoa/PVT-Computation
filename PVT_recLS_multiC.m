@@ -7,28 +7,12 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
 %               to the pseudoranges given by the input (pr).
 %               
 % Input:            
-%           pr:     1xNsat vector with the observed pseudoranges at time 
-%                   TOW for the Nsat satellites with ID given by svn
-%           svn:    1xNsat vector containing the ID of the satellites from
-%                   which the pseudoranges in pr has been measured.
-%           TOW:    TOW of the epoch that the pseudoranges in pr has been 
-%                   measured
-%           eph:    Matrix with the ephemerides information needed to
-%                   obtain pseudorange corrections and the coordinates of
-%                   the satellites
-%           iono:   Ionosphere parameters to get ionosphere corrections
-%           Nit:    # of iterations applied in the iterative LS algorithm
-%                   used to obtain the PVT solution
-%           PVT0:   Initial guess of the user position used for the
-%                   linearization process of the navigaiton equations
+%               acq_info:   Struct with all the acquisition information
+%                           extracted from the phone.
+%               eph:        Struct with all the matrix ephemeris 
+%                           information for different constellations
 %
-% Output:   PVT:    Nsolx1 vector with the estimated PVT solution 
-%           A:      NsatxNsol matrix with the geometry information. This is
-%                   the geometry matrix studied in lectures: "PVT = A*pr"
-%           tcorr:  Satellite clock correction in [sec.]
-%           Pcorr:  Corrections in [meters] for the propagation effects. 
-%                   Mainly ionosphere and troposphere corrections
-%                   
+% Output:       PVT:        Nsolx1 vector with the estimated PVT solution                  
 %
         
     %% General initializations
@@ -261,11 +245,19 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
         end
         
         %% LS corrections
-        d               =   inv(G'*W*G)*G'*W*p;         % PVT update
+        H               =   inv(G'*W*G);
+        d               =   H*G'*W*p;         % PVT update
         PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
         PVT(4)          =   PVT(4) + d(4)/c;     % Update receiver clock offset
         %
     end
+    GDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3) + H(4,4));
+    PDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3));
+    TDOP    =   sqrt(H(4,4));
+    
+    fprintf('\nGDOP: %f', GDOP);
+    fprintf('\nPDOP: %f', PDOP);
+    fprintf('\nTDOP: %f\n\n:', TDOP);
     %tcorr   =   [GPS_tcorr' Galileo_tcorr];
     %Pcorr   =   [GPS_Pcorr Galileo_Pcorr];
     %tcorr = mean(tcorr);
