@@ -2,6 +2,7 @@ function test_mainGNSS()
 
 tic
 
+%% Choosing data
 option = 8;
 
 switch option
@@ -34,11 +35,10 @@ json            = strcat('JSON/', json_fn);
 json_content    = load_info(json);
 
 %% Execution
-
 [lat, long] = main_GNSS(json_content);
 fprintf('\nCopy to Google:');
-fprintf('\n%f, %f\n', lat, long);
+fprintf('\n%f, %f\n\n', lat, long);
 
-
+toc
 
 end

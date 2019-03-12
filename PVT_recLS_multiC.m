@@ -34,7 +34,7 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
     %% General initializations
     c           =   299792458; 
     Nit         =   5; 
-    emptysat    = [];
+    emptysat    =   [];
     
     %% LS loop
     for iter = 1:Nit
@@ -56,13 +56,16 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
                 GPS_X           =   zeros(3, nGPS);
                 GPS_pr          =   [];
                 GPS_svn         =   [];
+                GPS_CN0         =   [];
                 for i=1:nGPS
                     GPS_pr      =   [GPS_pr acq_info.SV.GPS(i).p];
                     GPS_svn     =   [GPS_svn acq_info.SV.GPS(i).svid];
+                    GPS_CN0     =   [GPS_CN0 acq_info.SV.GPS(i).CN0];
                 end    
                 GPS_svn         =   (unique(GPS_svn', 'rows'))';
                 GPS_pr          =   GPS_pr(1:length(GPS_svn));
-                nGPS            =   length(GPS_svn); 
+                GPS_CN0         =   GPS_CN0(1:length(GPS_svn));
+                nGPS            =   length(GPS_svn);
             end
         
             for sat = 1:nGPS                
@@ -132,6 +135,7 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
         else
             GPS_A       =   [];
             GPS_p       =   [];
+            GPS_CN0     =   [];
             GPS_tcorr   =   [];
             GPS_Pcorr   =   [];
         end
@@ -148,13 +152,16 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
                 %X           =   zeros(3, nGalileo);
                 Galileo_pr          = [];
                 Galileo_svn         = [];
+                Galileo_CN0         = [];
                 for i=1:nGalileo
                     Galileo_pr      =   [Galileo_pr acq_info.SV.Galileo(i).p];
                     Galileo_svn     =   [Galileo_svn acq_info.SV.Galileo(i).svid];
+                    Galileo_CN0     =   [Galileo_CN0 acq_info.SV.Galileo(i).CN0];
                 end
                 Galileo_svn         =   (unique(Galileo_svn', 'rows'))';
                 Galileo_pr          =   Galileo_pr(1:length(Galileo_svn));
-                nGalileo            =   length(Galileo_svn); 
+                Galileo_CN0         =   Galileo_CN0(1:length(Galileo_svn));
+                nGalileo            =   length(Galileo_svn);
             end
             
             for sat = 1:nGalileo
@@ -224,11 +231,13 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
         else
             Galileo_A       =   [];
             Galileo_p       =   [];
+            Galileo_CN0     =   [];
             Galileo_tcorr   =   [];
             Galileo_Pcorr   =   [];
         end
         
-        % Add multiconstellation column (GPS + Galileo)
+        %% Multiconstellation settings (GPS + Galileo)
+        % Add multiconstellation column
         if iter == 1
             if acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo
                 GPS_A       =   [GPS_A zeros(length(GPS_A), 1)];
@@ -236,17 +245,23 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
             end
         end
         
-        % Unions
-        G   =   [GPS_A; Galileo_A];
-        p   =   [GPS_p; Galileo_p];
+        % Multiconstellation unions
+        G       =   [GPS_A; Galileo_A];
+        p       =   [GPS_p; Galileo_p];
+        CN0     =   [GPS_CN0 Galileo_CN0];
         
         % Add last column  
         G = [G ones(length(G), 1)];
         
-        %% LS corrections
+        %% Weighting matrix
+        if acq_info.flags.algorithm.WLS
+            W   =   compute_Wmatrix(CN0);
+        else
+            W   =   eye(length(G));
+        end
         
-        %--     Get the LS estimate of PVT at iteration iter
-        d               =   pinv(G) * p;         % PVT update
+        %% LS corrections
+        d               =   inv(G'*W*G)*G'*W*p;         % PVT update
         PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
         PVT(4)          =   PVT(4) + d(4)/c;     % Update receiver clock offset
         %
