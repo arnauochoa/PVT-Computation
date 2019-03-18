@@ -18,6 +18,7 @@ acq_info.flags      =   GNSS_info.Params;
 
 %% Location
 acq_info.refLocation.LLH = [GNSS_info.Location.latitude GNSS_info.Location.longitude GNSS_info.Location.altitude];
+acq_info.refLocation.LLH = [41.4991 2.1155 179.058]; %geodesic reference
 acq_info.refLocation.XYZ = lla2ecef(acq_info.refLocation.LLH); 
 
 %% Clock info
@@ -264,7 +265,8 @@ for i=1:length(GNSS_info.ephData.GLONASS)
 end
 
 % ionoProto
-acq_info.ionoProto                        =   [GNSS_info.ephData.ionoProto.alpha_; GNSS_info.ephData.ionoProto.beta_];
+acq_info.ionoProto                        =   [GNSS_info.ephData.Klobuchar.alpha_; GNSS_info.ephData.Klobuchar.beta_];
+%acq_info.ionoProto                        =   [GNSS_info.ephData.ionoProto.alpha_; GNSS_info.ephData.ionoProto.beta_];
 
 %% Number of total SV
 acq_info.SVs = nGPS + nSBAS + nGLONASS + nQZSS + nBEIDOU + nGalileo + nUNK;

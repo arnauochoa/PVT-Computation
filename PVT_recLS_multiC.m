@@ -255,9 +255,9 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
     PDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3));
     TDOP    =   sqrt(H(4,4));
     
-    fprintf('\nGDOP: %f', GDOP);
-    fprintf('\nPDOP: %f', PDOP);
-    fprintf('\nTDOP: %f\n\n:', TDOP);
+    %fprintf('\nGDOP: %f', GDOP);
+    %fprintf('\nPDOP: %f', PDOP);
+    %fprintf('\nTDOP: %f\n\n:', TDOP);
     %tcorr   =   [GPS_tcorr' Galileo_tcorr];
     %Pcorr   =   [GPS_Pcorr Galileo_Pcorr];
     %tcorr = mean(tcorr);
