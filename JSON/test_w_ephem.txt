@@ -1,5 +1,5 @@
 {
-  "Params": {
+  "Params": [{
     "constellations": {
       "GPS": false,
       "Galileo": true,
@@ -22,6 +22,52 @@
       "KAL": false
     }
   },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
   "Location": {
     "latitude": 41.48803585756352,
     "longitude": 2.148600305366178,
@@ -4235,7 +4281,7 @@
         "svid": 24
       }
     ],
-    "ionoProto": {
+    "Klobuchar": {
       "alpha_": [
         8.381903171539307E-9,
         -7.450580596923828E-9,

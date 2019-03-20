@@ -1,4 +1,4 @@
-function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
+function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
 % PVT_recLS:    Computation of the receiver position at time TOW from  
 %               pseudoranges (pr) and ephemerides information (eph). 
 %               Implementation using the iterative Least-Squares principle 
@@ -234,26 +234,32 @@ function    [PVT, A, tcorr, Pcorr, X]  =   PVT_recLS_multiC(acq_info, eph)
         p       =   [GPS_p; Galileo_p];
         CN0     =   [GPS_CN0 Galileo_CN0];
         
-        % Add last column  
+        %% Add last column  
         G = [G ones(length(G), 1)];
         
-        %% Weighting matrix
-        if acq_info.flags.algorithm.WLS
-            W   =   compute_Wmatrix(CN0);
+        if size(G, 1) >= (3 + acq_info.flags.constellations.GPS + acq_info.flags.constellations.Galileo)
+            %% Weighting matrix
+            if acq_info.flags.algorithm.WLS
+                W   =   compute_Wmatrix(CN0);
+            else
+                W   =   eye(length(G));
+            end
+
+            %% LS corrections
+            H               =   inv(G'*W*G);
+            d               =   H*G'*W*p;         % PVT update
+            PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
+            PVT(4)          =   PVT(4) + d(4)/c;     % Update receiver clock offset
+            
+            GDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3) + H(4,4));
+            PDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3));
+            TDOP    =   sqrt(H(4,4));
         else
-            W   =   eye(length(G));
+            PVT     =   [0 0 0 0];
+            fprintf('Not enough satellites. Number is %G, needed: %G\n', size(G, 1), ((3 + acq_info.flags.constellations.GPS + acq_info.flags.constellations.Galileo)));
         end
-        
-        %% LS corrections
-        H               =   inv(G'*W*G);
-        d               =   H*G'*W*p;         % PVT update
-        PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
-        PVT(4)          =   PVT(4) + d(4)/c;     % Update receiver clock offset
         %
     end
-    GDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3) + H(4,4));
-    PDOP    =   sqrt(H(1,1) + H(2,2) + H(3,3));
-    TDOP    =   sqrt(H(4,4));
     
     %fprintf('\nGDOP: %f', GDOP);
     %fprintf('\nPDOP: %f', PDOP);

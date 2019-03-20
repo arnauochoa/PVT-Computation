@@ -1,4 +1,4 @@
-function acq_info = extract_info(GNSS_info)
+function acq_info = extract_info(GNSS_info, j)
 
 % Checking all the struct and separing into constellations
 
@@ -14,11 +14,12 @@ acq_info.SV_list.SVlist_UNK         =   [];
 c                                   =   299792458;
 
 %% Flags
-acq_info.flags      =   GNSS_info.Params;
+acq_info.flags      =   GNSS_info.Params(j);
 
 %% Location
 acq_info.refLocation.LLH = [GNSS_info.Location.latitude GNSS_info.Location.longitude GNSS_info.Location.altitude];
-acq_info.refLocation.LLH = [41.4991 2.1155 179.058]; %geodesic reference
+%acq_info.refLocation.LLH = [41.4991 2.1155 179.058]; %geodesic reference
+%acq_info.refLocation.LLH = [41.500019, 2.112665 240]; % Q5
 acq_info.refLocation.XYZ = lla2ecef(acq_info.refLocation.LLH); 
 
 %% Clock info
