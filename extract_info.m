@@ -26,6 +26,8 @@ acq_info.refLocation.XYZ = lla2ecef(acq_info.refLocation.LLH);
 acq_info.nsrxTime = GNSS_info.Clock.timeNanos;
 if GNSS_info.Clock.hasBiasNanos
     acq_info.nsGPSTime =  (acq_info.nsrxTime - (GNSS_info.Clock.biasNanos + GNSS_info.Clock.fullBiasNanos));
+else
+    acq_info.nsGPSTime =  (acq_info.nsrxTime - (GNSS_info.Clock.fullBiasNanos));
 end
 [tow, now]      = nsgpst2gpst(acq_info.nsGPSTime);
 acq_info.TOW    = tow;
@@ -45,16 +47,19 @@ for i=1:length(GNSS_info.Meas)
 
     switch GNSS_info.Meas(i).constellationType
         case 1
-            acq_info.SV_list.SVlist_GPS                     =   [acq_info.SV_list.SVlist_GPS GNSS_info.Meas(i).svid];
-            acq_info.SV.GPS(nGPS).svid                      =   GNSS_info.Meas(i).svid;
-            acq_info.SV.GPS(nGPS).carrierFreq               =   GNSS_info.Meas(i).carrierFrequencyHz;
-            acq_info.SV.GPS(nGPS).t_tx                      =   GNSS_info.Meas(i).receivedSvTimeNanos;
-            acq_info.SV.GPS(nGPS).pseudorangeRate           =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
-            acq_info.SV.GPS(nGPS).CN0                       =   GNSS_info.Meas(i).cn0DbHz;
-            acq_info.SV.GPS(nGPS).phase                     =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
-            acq_info.SV.GPS(nGPS).phaseState                =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
-            acq_info.SV.GPS(nGPS).p                         =   pseudo_gen(acq_info.SV.GPS(nGPS).t_tx, tow, c);
-            nGPS                                            =   nGPS + 1;
+            if check_state(GNSS_info.Meas(i).state)
+                acq_info.SV_list.SVlist_GPS                     =   [acq_info.SV_list.SVlist_GPS GNSS_info.Meas(i).svid];
+                acq_info.SV.GPS(nGPS).svid                      =   GNSS_info.Meas(i).svid;
+                acq_info.SV.GPS(nGPS).carrierFreq               =   GNSS_info.Meas(i).carrierFrequencyHz;
+                acq_info.SV.GPS(nGPS).t_tx                      =   GNSS_info.Meas(i).receivedSvTimeNanos;
+                acq_info.SV.GPS(nGPS).t_rx                      =   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/604800e9)*604800e9;
+                acq_info.SV.GPS(nGPS).pseudorangeRate           =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+                acq_info.SV.GPS(nGPS).CN0                       =   GNSS_info.Meas(i).cn0DbHz;
+                acq_info.SV.GPS(nGPS).phase                     =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+                acq_info.SV.GPS(nGPS).phaseState                =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+                acq_info.SV.GPS(nGPS).p                         =   pseudo_gen(acq_info.SV.GPS(nGPS).t_tx, acq_info.SV.GPS(nGPS).t_rx, c);
+                nGPS                                            =   nGPS + 1;
+            end
         case 2
             acq_info.SV_list.SVlist_SBAS                    =   [acq_info.SV_list.SVlist_SBAS GNSS_info.Meas(i).svid];
             acq_info.SV.SBAS(nSBAS).svid                    =   GNSS_info.Meas(i).svid;
@@ -89,16 +94,19 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.BEIDOU(nBEIDOU).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
             nBEIDOU                                         =   nBEIDOU + 1;
         case 6
-            acq_info.SV_list.SVlist_Galileo          	    =   [acq_info.SV_list.SVlist_Galileo GNSS_info.Meas(i).svid];
-            acq_info.SV.Galileo(nGalileo).svid           	=   GNSS_info.Meas(i).svid;
-            acq_info.SV.Galileo(nGalileo).carrierFreq    	=   GNSS_info.Meas(i).carrierFrequencyHz;
-            acq_info.SV.Galileo(nGalileo).t_tx              =   GNSS_info.Meas(i).receivedSvTimeNanos;
-            acq_info.SV.Galileo(nGalileo).pseudorangeRate   =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
-            acq_info.SV.Galileo(nGalileo).CN0               =   GNSS_info.Meas(i).cn0DbHz;
-            acq_info.SV.Galileo(nGalileo).phase             =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
-            acq_info.SV.Galileo(nGalileo).phaseState        =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
-            acq_info.SV.Galileo(nGalileo).p                 =   pseudo_gen(acq_info.SV.Galileo(nGalileo).t_tx, tow, c);
-            nGalileo                                        =   nGalileo + 1;
+            if check_state(GNSS_info.Meas(i).state) && check_Galstate(GNSS_info.Meas(i).state)
+                acq_info.SV_list.SVlist_Galileo          	    =   [acq_info.SV_list.SVlist_Galileo GNSS_info.Meas(i).svid];
+                acq_info.SV.Galileo(nGalileo).svid           	=   GNSS_info.Meas(i).svid;
+                acq_info.SV.Galileo(nGalileo).carrierFreq    	=   GNSS_info.Meas(i).carrierFrequencyHz;
+                acq_info.SV.Galileo(nGalileo).t_tx              =   GNSS_info.Meas(i).receivedSvTimeNanos;
+                acq_info.SV.Galileo(nGalileo).t_rx              =   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/100e6)*100e6;
+                acq_info.SV.Galileo(nGalileo).pseudorangeRate   =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+                acq_info.SV.Galileo(nGalileo).CN0               =   GNSS_info.Meas(i).cn0DbHz;
+                acq_info.SV.Galileo(nGalileo).phase             =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+                acq_info.SV.Galileo(nGalileo).phaseState        =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+                acq_info.SV.Galileo(nGalileo).p                 =   pseudo_gen(acq_info.SV.Galileo(nGalileo).t_tx, acq_info.SV.Galileo(nGalileo).t_rx, c);
+                nGalileo                                        =   nGalileo + 1;
+            end
         otherwise
             acq_info.SV_list.SVlist_UNK                     =   [acq_info.SV_list.SVlist_UNK GNSS_info.Meas(i).svid];
             acq_info.SV.UNK(nUNK).svid                      =   GNSS_info.Meas(i).svid;

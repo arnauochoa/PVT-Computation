@@ -9,7 +9,8 @@ addpath 'Misc';
 addpath 'Observations';
 addpath 'JSON';
     
-boolprint = 0;
+boolprint   =   0;
+testt        =   0;
 
 %% Build struct from JSON
 GNSS_info       = jsondecode(json_content);
@@ -20,20 +21,30 @@ for i=1:length(GNSS_info)
     %% Executions with different configurations
     for j=1:length(GNSS_info(i).Params)
         %% Create acquisition struct from GNSS_info
-        acq_info        =   extract_info(GNSS_info(i), j);
+        
+%         if testt
+%             if i == 1
+%                 for z=1:length(GNSS_info)
+%                     acq_infos(z)        =   extract_info(GNSS_info(z), j);
+%                 end           
+%             acq_info    =   create_info_avp(acq_infos); 
+%             end
+%         else 
+            acq_info        =   extract_info(GNSS_info(i), j);
+%         end
 
         %% Some initializations
         PVT0        =   acq_info.refLocation.XYZ;  % Preliminary guess for PVT solution     
         c           =   299792458;       %   Speed of light (m/s)
 
         %% Hardcoded for testing (in order not to modify the files directly)
-%         acq_info.flags.constellations.GPS           =   1;
-%         acq_info.flags.constellations.Galileo       =   1;
-%         acq_info.flags.corrections.ionosphere       =   0;
-%         acq_info.flags.corrections.troposphere      =   0;
-         acq_info.flags.corrections.f2corr           =   0;
-%         acq_info.flags.algorithm.LS                 =   0;
-%         acq_info.flags.algorithm.WLS                =   0;
+        acq_info.flags.constellations.GPS           =   0;
+        acq_info.flags.constellations.Galileo       =   1;
+        acq_info.flags.corrections.ionosphere       =   0;
+        acq_info.flags.corrections.troposphere      =   0;
+        acq_info.flags.algorithm.LS                 =   0;
+        acq_info.flags.algorithm.WLS                =   0;
+        acq_info.flags.corrections.f2corr           =   0;
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';
@@ -72,8 +83,8 @@ for i=1:length(GNSS_info)
         PVTs(i, j, :) 	=	PVT;
         
         % LLH
-        result              =   [xyz2llh(PVT(i, 1:3)) PVT(i, 4)];
-        result              =   [rad2deg(result(i, 1:2)) result(i, 3) result(i, 4)];       
+        result              =   [xyz2llh(PVT(1:3)) PVT(4)];
+        result              =   [rad2deg(result(1:2)) result(3) result(4)];       
         results(i, j, :)    =   result;
 
         if boolprint

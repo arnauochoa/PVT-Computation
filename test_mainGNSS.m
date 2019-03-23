@@ -657,6 +657,31 @@ switch option
         json_fn         =   'Logs_test_dia_15_3/15032019_124656/15032019_125844.txt';
     case 323
         json_fn         =   'Logs_test_dia_15_3/15032019_124656/15032019_125850.txt';
+    case 324
+        json_fn         =   '21032019_123623/21032019_123629.txt';
+    case 325
+        json_fn         =   '21032019_123623/21032019_123635.txt';
+    case 326
+        json_fn         =   '21032019_123623/21032019_123641.txt';
+    case 327
+        json_fn         =   '21032019_131340/21032019_131447.txt';
+    case 328
+        json_fn         =   '21032019_131340/21032019_131417.txt';
+    case 329
+        json_fn         =   '21032019_131340/21032019_131447.txt';
+    case 330
+        json_fn         =   '21032019_131340/21032019_131509.txt';
+    case 331
+        json_fn         =   '21032019_131340/21032019_131631.txt';
+    case 332
+        json_fn         =   '21032019_131340/21032019_131615.txt';
+    case 333
+        json_fn         =   '21032019_131340/21032019_131709.txt';
+    case 334
+        json_fn         =   '21032019_131340/21032019_131345.txt';
+    case 335
+        json_fn         =   '21032019_131340/21032019_131648.txt';
+
 end
 
 %% Build str from JSON
@@ -669,13 +694,13 @@ for i=1:size(results, 1)
     p_err           =   sqrt((test(1:3) - lla2ecef(results(i, 1:3))).^2);
     fprintf('\n(Averaged) computed position and time for configuration %G\n', i);
     fprintf('Latitude: %f Longitude: %f Height: %f Time: %f\n', results(i, 1), results(i, 2), results(i, 3), results(i, 4));
-    fprintf(strcat('2D error: %f m\n\n'), sqrt((p_err(1))^2 + (p_err(2))^2));
+    fprintf(strcat('2D error: %f m\n'), sqrt((p_err(1))^2 + (p_err(2))^2));
 end
 
-for i=1:size(results, 1)   
-    fprintf('Configuration %G. Copy to Google:\n', i);
-    fprintf('%f, %f\n\n', results(i, 1), results(i, 2));
-end
+% for i=1:size(results, 1)   
+%     fprintf('Configuration %G. Copy to Google:\n', i);
+%     fprintf('%f, %f\n\n', results(i, 1), results(i, 2));
+% end
 
 toc
 

@@ -1,28 +1,74 @@
 [
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.499173614403524,
       "longitude": 2.1154509815993263,
@@ -4308,29 +4354,75 @@
     }
   },
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.49917523255795,
       "longitude": 2.115450109481586,
@@ -8616,29 +8708,75 @@
     }
   },
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.499175835970924,
       "longitude": 2.1154543334308937,
@@ -12924,29 +13062,75 @@
     }
   },
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.49917547229225,
       "longitude": 2.1154528899428846,
@@ -17212,29 +17396,75 @@
     }
   },
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.4991767706665,
       "longitude": 2.1154534040535715,
@@ -21500,29 +21730,75 @@
     }
   },
   {
-    "Params": {
-      "constellations": {
-        "GPS": true,
-        "Galileo": true,
-        "GLONASS": false
-      },
-      "bands": {
-        "L1": true,
-        "L5": true
-      },
-      "corrections": {
-        "ionosphere": true,
-        "troposphere": true,
-        "multipath": false,
-        "PPP": false,
-        "camera": false
-      },
-      "algorithm": {
-        "LS": true,
-        "WLS": false,
-        "KAL": false
-      }
+    "Params": [{
+    "constellations": {
+      "GPS": false,
+      "Galileo": true,
+      "GLONASS": false
     },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": true,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  },
+  {
+    "constellations": {
+      "GPS": true,
+      "Galileo": false,
+      "GLONASS": false
+    },
+    "bands": {
+      "L1": true,
+      "L5": false
+    },
+    "corrections": {
+      "ionosphere": false,
+      "troposphere": false,
+      "multipath": false,
+      "PPP": false,
+      "camera": false
+    },
+    "algorithm": {
+      "LS": true,
+      "WLS": false,
+      "KAL": false
+    }
+  }],
     "Location": {
       "latitude": 41.49917602085232,
       "longitude": 2.1154518939723936,
