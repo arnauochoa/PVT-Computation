@@ -35,7 +35,6 @@ end
 
 
 %% Galileo
-
 if flags.constellations.Galileo
     Galileo         =   SVinfo.Galileo;
     ephemerides     =   zeros(22, length(Galileo));
@@ -66,5 +65,4 @@ if flags.constellations.Galileo
     end
     eph.Galileo = ephemerides;
 end
-
 end

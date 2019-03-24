@@ -66,10 +66,10 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
                 if acq_info.flags.corrections.ionosphere || acq_info.flags.corrections.troposphere
                     [GPS_tropoCorr, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, PVT(4));  % Iono + Tropo correction
                     if acq_info.flags.corrections.troposphere 
-                        GPS_corr            =   GPS_corr + GPS_tropoCorr; % troposphere correction
+                        GPS_corr            =   GPS_corr - GPS_tropoCorr; % troposphere correction
                     end
                     if acq_info.flags.corrections.ionosphere
-                        GPS_corr            =   GPS_corr + GPS_ionoCorr; % ionosphere correction
+                        GPS_corr            =   GPS_corr - GPS_ionoCorr; % ionosphere correction
                     end
                 end
                 
@@ -104,7 +104,7 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
             end
             % Delete rows of 0s
             if iter == 1
-                for i=1:length(GPS_A)
+                for i=1:size(GPS_A, 1)
                     if GPS_A(i,:) == 0
                         emptysat = [emptysat i];
                     end
@@ -200,7 +200,7 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
             end
             % Delete rows of 0s
             if iter == 1
-                for i=1:length(Galileo_A)
+                for i=1:size(Galileo_A, 1)
                     if Galileo_A(i,:) == 0
                         emptysat = [emptysat i];
                     end
@@ -224,8 +224,8 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
         % Add multiconstellation column
         if iter == 1
             if acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo
-                GPS_A       =   [GPS_A zeros(length(GPS_A), 1)];
-                Galileo_A   =   [Galileo_A ones(length(Galileo_A), 1)];
+                GPS_A       =   [GPS_A zeros(size(GPS_A, 1), 1)];
+                Galileo_A   =   [Galileo_A ones(size(Galileo_A, 1), 1)];
             end
         end
         
@@ -235,7 +235,7 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
         CN0     =   [GPS_CN0 Galileo_CN0];
         
         %% Add last column  
-        G = [G ones(length(G), 1)];
+        G = [G ones(size(G, 1), 1)];
         
         if size(G, 1) >= (3 + acq_info.flags.constellations.GPS + acq_info.flags.constellations.Galileo)
             %% Weighting matrix
@@ -256,7 +256,7 @@ function    [PVT, H]  =   PVT_recLS_multiC(acq_info, eph)
             TDOP    =   sqrt(H(4,4));
         else
             PVT     =   [0 0 0 0];
-            fprintf('Not enough satellites. Number is %G, needed: %G\n', size(G, 1), ((3 + acq_info.flags.constellations.GPS + acq_info.flags.constellations.Galileo)));
+            H       =   [];
         end
         %
     end

@@ -47,7 +47,7 @@ for i=1:length(GNSS_info.Meas)
 
     switch GNSS_info.Meas(i).constellationType
         case 1
-            if check_state(GNSS_info.Meas(i).state)
+            if check_GPSstate(GNSS_info.Meas(i).state)
                 acq_info.SV_list.SVlist_GPS                     =   [acq_info.SV_list.SVlist_GPS GNSS_info.Meas(i).svid];
                 acq_info.SV.GPS(nGPS).svid                      =   GNSS_info.Meas(i).svid;
                 acq_info.SV.GPS(nGPS).carrierFreq               =   GNSS_info.Meas(i).carrierFrequencyHz;
@@ -94,7 +94,7 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.BEIDOU(nBEIDOU).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
             nBEIDOU                                         =   nBEIDOU + 1;
         case 6
-            if check_state(GNSS_info.Meas(i).state) && check_Galstate(GNSS_info.Meas(i).state)
+            if check_Galstate(GNSS_info.Meas(i).state)
                 acq_info.SV_list.SVlist_Galileo          	    =   [acq_info.SV_list.SVlist_Galileo GNSS_info.Meas(i).svid];
                 acq_info.SV.Galileo(nGalileo).svid           	=   GNSS_info.Meas(i).svid;
                 acq_info.SV.Galileo(nGalileo).carrierFreq    	=   GNSS_info.Meas(i).carrierFrequencyHz;
@@ -104,7 +104,7 @@ for i=1:length(GNSS_info.Meas)
                 acq_info.SV.Galileo(nGalileo).CN0               =   GNSS_info.Meas(i).cn0DbHz;
                 acq_info.SV.Galileo(nGalileo).phase             =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
                 acq_info.SV.Galileo(nGalileo).phaseState        =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
-                acq_info.SV.Galileo(nGalileo).p                 =   pseudo_gen(acq_info.SV.Galileo(nGalileo).t_tx, acq_info.SV.Galileo(nGalileo).t_rx, c);
+                acq_info.SV.Galileo(nGalileo).p                 =   pseudo_gen(mod(acq_info.SV.Galileo(nGalileo).t_tx, 100e6), mod(acq_info.SV.Galileo(nGalileo).t_rx, 100e6), c);
                 nGalileo                                        =   nGalileo + 1;
             end
         otherwise
@@ -257,19 +257,40 @@ for i=1:length(GNSS_info.ephData.Galileo)
             acq_info.SV.Galileo(j).keplerModel.omegaDot         =   GNSS_info.ephData.Galileo(i).keplerModel.omegaDot;
             acq_info.SV.Galileo(j).keplerModel.sqrtA            =   GNSS_info.ephData.Galileo(i).keplerModel.sqrtA;
             acq_info.SV.Galileo(j).keplerModel.toeS             =   GNSS_info.ephData.Galileo(i).keplerModel.toeS;
-             
         end
     end
 end
 
-% GLONASS
-for i=1:length(GNSS_info.ephData.GLONASS)
-    for j=1:nGLONASS
-        if acq_info.SV.GLONASS(j).svid == GNSS_info.ephData.GLONASS(i).svid
-            acq_info.SV.GLONASS(j).XYZ = [GNSS_info.ephData.GLONASS(i).xSatPosM ... 
-                GNSS_info.ephData.GLONASS(i).ySatPosM ...
-                GNSS_info.ephData.GLONASS(i).zSatPosM];
+
+if nGPS ~= 0
+        count = 1;
+        noEph = [];
+        for i=1:length(acq_info.SV.GPS)
+           if isempty(acq_info.SV.GPS(i).TOW)
+               noEph(count) = i;
+               count = count + 1;
+           end
         end
+
+    noEph = fliplr(noEph);
+    for i=1:length(noEph)
+        acq_info.SV.GPS(noEph(i)) = [];
+    end
+end
+
+if nGalileo ~= 0
+    count = 1;
+    noEph = [];
+    for i=1:length(acq_info.SV.Galileo)
+       if isempty(acq_info.SV.Galileo(i).TOW)
+           noEph(count) = i;
+           count = count + 1;
+       end
+    end
+
+    noEph = fliplr(noEph);
+    for i=1:length(noEph)
+        acq_info.SV.Galileo(noEph(i)) = [];
     end
 end
 
