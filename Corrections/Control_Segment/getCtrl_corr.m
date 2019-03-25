@@ -43,7 +43,7 @@ function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
     %--     Account for the relativistic effect on the satellite clock bias
     %       and the time of transmission
     tcorr       =   tcorr + trel;   
-    tx_GPS      =   tx_GPS - tcorr;  % Corrected GPS time
+    tx_GPS      =   tx_RAW - tcorr;  % Corrected GPS time
     %
     %--     Recompute the satellite coordinates with the corrected time and
     %       some additional correction (i.e. Sagnac effect / rotation
