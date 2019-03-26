@@ -2,13 +2,16 @@ function test_mainGNSS()
 
 tic
 
+close all
+clear all
+
 %% Choosing data  
 % 536 to 636 works
 % 637 to 797 does not work
 % 801 yo 852 works
 % 854 to 907 works
-opmin   =   800;
-opmax	=   801;
+opmin   =   220;
+opmax	=   300;
 
 for op=opmin:opmax
     
@@ -35,6 +38,7 @@ for op=opmin:opmax
         GPS_tropo       =   results(i, 9);
         Galileo_iono    =   results(i, 10);
         Galileo_tropo   =   results(i, 11);
+        NS              =   results(i, 12);
         
         fprintf('\n(Averaged) computed position and time for configuration %G\n', i);
         fprintf('Latitude: %f Longitude: %f Height: %f Time bias: %f\n', results(i, 1), results(i, 2), results(i, 3), results(i, 4));
@@ -44,15 +48,16 @@ for op=opmin:opmax
     end
 
     if isempty(results)
-        D2              = inf; 
-        D3              = inf;
-      	GDOP            = inf;
-        TDOP            = inf;
-        PDOP            = inf;
-        GPS_iono        = inf;
-        GPS_tropo       = inf;
-        Galileo_iono    = inf;
-        Galileo_tropo   = inf;
+        D2              = NaN; 
+        D3              = NaN;
+      	GDOP            = NaN;
+        TDOP            = NaN;
+        PDOP            = NaN;
+        GPS_iono        = NaN;
+        GPS_tropo       = NaN;
+        Galileo_iono    = NaN;
+        Galileo_tropo   = NaN;
+        NS              = 0;
     end
 
     TOTALres_D2(op-(opmin-1))               =   D2;
@@ -64,6 +69,7 @@ for op=opmin:opmax
     TOTAL_resGPS_tropo(op-(opmin-1))        =   GPS_tropo;
     TOTAL_resGalileo_iono(op-(opmin-1))     =   Galileo_iono;
     TOTAL_resGalileo_tropo(op-(opmin-1))    =   Galileo_tropo;
+    TOTAL_resNS(op-(opmin-1))               =   NS;
     
 end
 
@@ -117,6 +123,13 @@ title('Galileo iono correction')
 figure
 plot(TOTAL_resGalileo_tropo(1:(opmax-(opmin-1))))
 title('Galileo tropo correction')
+
+figure
+plot(TOTAL_resNS(1:(op-(opmin-1))))
+title('Satellite number')
+
+TOTALres_D2mean;
+TOTALres_D3mean;
 
 toc
 

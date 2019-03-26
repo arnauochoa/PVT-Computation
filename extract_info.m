@@ -25,14 +25,13 @@ acq_info.refLocation.LLH = [GNSS_info.Location.latitude GNSS_info.Location.longi
 acq_info.refLocation.XYZ = lla2ecef(acq_info.refLocation.LLH); 
 
 %% Clock info
-acq_info.nsrxTime = GNSS_info.Clock.timeNanos;
 if GNSS_info.Clock.hasBiasNanos
-    acq_info.nsGPSTime =  (acq_info.nsrxTime - (GNSS_info.Clock.biasNanos + GNSS_info.Clock.fullBiasNanos));
+    acq_info.nsGNSSTime =  (GNSS_info.Clock.timeNanos - (GNSS_info.Clock.biasNanos + GNSS_info.Clock.fullBiasNanos));
 else
-    acq_info.nsGPSTime =  (acq_info.nsrxTime - (GNSS_info.Clock.fullBiasNanos));
+    acq_info.nsGNSSTime =  (GNSS_info.Clock.timeNanos - (GNSS_info.Clock.fullBiasNanos));
 end
-[tow, now]      = nsgpst2gpst(acq_info.nsGPSTime);
-acq_info.TOW    = tow;
+[tow, now]      = nsgpst2gpst(acq_info.nsGNSSTime);
+acq_info.TOW    = mod(acq_info.nsGNSSTime, 604800e9)/1e9;
 acq_info.NOW    = now;
 
 %% Measurements
@@ -51,14 +50,14 @@ for i=1:length(GNSS_info.Meas)
 
     switch GNSS_info.Meas(i).constellationType
         case 1
-            if check_GPSstate(GNSS_info.Meas(i).state)
+            if check_TOWstate(GNSS_info.Meas(i).state)
                 if GNSS_info.Meas(i).carrierFrequencyHz > 1400e6
                     acq_info.SV_list.SVlist_GPSL1                       =   [acq_info.SV_list.SVlist_GPSL1 GNSS_info.Meas(i).svid];
                     acq_info.SV.GPS.GPSL1(nGPSL1).svid              	=   GNSS_info.Meas(i).svid;
                     acq_info.SV.GPS.GPSL1(nGPSL1).state                	=   GNSS_info.Meas(i).state;
                     acq_info.SV.GPS.GPSL1(nGPSL1).carrierFreq         	=   GNSS_info.Meas(i).carrierFrequencyHz;
-                    acq_info.SV.GPS.GPSL1(nGPSL1).t_tx                 	=   GNSS_info.Meas(i).receivedSvTimeNanos;
-                    acq_info.SV.GPS.GPSL1(nGPSL1).t_rx                	=   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/604800e9)*604800e9;
+                    acq_info.SV.GPS.GPSL1(nGPSL1).t_tx                 	=   GNSS_info.Meas(i).receivedSvTimeNanos + GNSS_info.Meas(i).timeOffsetNanos;
+                    acq_info.SV.GPS.GPSL1(nGPSL1).t_rx                	=   mod(acq_info.nsGNSSTime, 604800e9);
                     acq_info.SV.GPS.GPSL1(nGPSL1).pseudorangeRate     	=   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
                     acq_info.SV.GPS.GPSL1(nGPSL1).CN0                 	=   GNSS_info.Meas(i).cn0DbHz;
                     acq_info.SV.GPS.GPSL1(nGPSL1).phase                	=   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
@@ -70,8 +69,8 @@ for i=1:length(GNSS_info.Meas)
                     acq_info.SV.GPS.GPSL5(nGPSL5).svid              	=   GNSS_info.Meas(i).svid;
                     acq_info.SV.GPS.GPSL5(nGPSL5).state               	=   GNSS_info.Meas(i).state;
                     acq_info.SV.GPS.GPSL5(nGPSL5).carrierFreq         	=   GNSS_info.Meas(i).carrierFrequencyHz;
-                    acq_info.SV.GPS.GPSL5(nGPSL5).t_tx                 	=   GNSS_info.Meas(i).receivedSvTimeNanos;
-                    acq_info.SV.GPS.GPSL5(nGPSL5).t_rx                 	=   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/604800e9)*604800e9;
+                    acq_info.SV.GPS.GPSL5(nGPSL5).t_tx                 	=   GNSS_info.Meas(i).receivedSvTimeNanos + GNSS_info.Meas(i).timeOffsetNanos;
+                    acq_info.SV.GPS.GPSL5(nGPSL5).t_rx                 	=   mod(acq_info.nsGNSSTime, 604800e9);
                     acq_info.SV.GPS.GPSL5(nGPSL5).pseudorangeRate     	=   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
                     acq_info.SV.GPS.GPSL5(nGPSL5).CN0                  	=   GNSS_info.Meas(i).cn0DbHz;
                     acq_info.SV.GPS.GPSL5(nGPSL5).phase               	=   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
@@ -114,33 +113,63 @@ for i=1:length(GNSS_info.Meas)
             acq_info.SV.BEIDOU(nBEIDOU).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
             nBEIDOU                                         =   nBEIDOU + 1;
         case 6
-            if check_Galstate(GNSS_info.Meas(i).state)
-                if GNSS_info.Meas(i).carrierFrequencyHz > 1400e6
-                    acq_info.SV_list.SVlist_GalileoE1                               =   [acq_info.SV_list.SVlist_GalileoE1 GNSS_info.Meas(i).svid];
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).svid                  =   GNSS_info.Meas(i).svid;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).state                 =   GNSS_info.Meas(i).state;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).carrierFreq           =   GNSS_info.Meas(i).carrierFrequencyHz;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx                  =   GNSS_info.Meas(i).receivedSvTimeNanos;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx                  =   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/100e6)*100e6;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).pseudorangeRate       =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).CN0                   =   GNSS_info.Meas(i).cn0DbHz;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).phase                 =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).phaseState            =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
-                    acq_info.SV.Galileo.GalileoE1(nGalileoE1).p                     =   pseudo_gen(mod(acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx, 100e6), mod(acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx, 100e6), c);
-                    nGalileoE1                                                      =   nGalileoE1 + 1;
+            if check_TOWstate(GNSS_info.Meas(i).state)
+                if check_Galstate(GNSS_info.Meas(i).state)
+                    if GNSS_info.Meas(i).carrierFrequencyHz > 1400e6
+                        acq_info.SV_list.SVlist_GalileoE1                               =   [acq_info.SV_list.SVlist_GalileoE1 GNSS_info.Meas(i).svid];
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).svid                  =   GNSS_info.Meas(i).svid;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).state                 =   GNSS_info.Meas(i).state;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).carrierFreq           =   GNSS_info.Meas(i).carrierFrequencyHz;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx                  =   mod((GNSS_info.Meas(i).receivedSvTimeNanos + GNSS_info.Meas(i).timeOffsetNanos), 100e6);
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx                  =   mod(acq_info.nsGNSSTime, 100e6);
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).pseudorangeRate       =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).CN0                   =   GNSS_info.Meas(i).cn0DbHz;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).phase                 =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).phaseState            =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+                        acq_info.SV.Galileo.GalileoE1(nGalileoE1).p                     =   pseudo_gen(acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx, acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx, c);
+                        nGalileoE1                                                      =   nGalileoE1 + 1;
+                    else
+                        acq_info.SV_list.SVlist_GalileoE5a                              =   [acq_info.SV_list.SVlist_GalileoE5a GNSS_info.Meas(i).svid];
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).svid                =   GNSS_info.Meas(i).svid;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).state           	=   GNSS_info.Meas(i).state;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).carrierFreq         =   GNSS_info.Meas(i).carrierFrequencyHz;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx                =   mod((GNSS_info.Meas(i).receivedSvTimeNanos + GNSS_info.Meas(i).timeOffsetNanos), 100e6);
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx                =   mod(acq_info.nsGNSSTime, 100e6);
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).pseudorangeRate     =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phase               =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phaseState          =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+                        acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).p                  	=   pseudo_gen(acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx, acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx, c);
+                        nGalileoE5a                                                     =   nGalileoE5a + 1;     
+                    end
                 else
-                    acq_info.SV_list.SVlist_GalileoE5a                              =   [acq_info.SV_list.SVlist_GalileoE5a GNSS_info.Meas(i).svid];
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).svid                =   GNSS_info.Meas(i).svid;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).state           	=   GNSS_info.Meas(i).state;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).carrierFreq         =   GNSS_info.Meas(i).carrierFrequencyHz;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx                =   GNSS_info.Meas(i).receivedSvTimeNanos;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx                =   acq_info.nsGPSTime - floor(-GNSS_info.Clock.fullBiasNanos/100e6)*100e6;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).pseudorangeRate     =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phase               =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phaseState          =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
-                    acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).p                   =   pseudo_gen(mod(acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx, 100e6), mod(acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx, 100e6), c);
-                    nGalileoE5a                                                     =   nGalileoE5a + 1;     
+%                     if GNSS_info.Meas(i).carrierFrequencyHz > 1400e6
+%                         acq_info.SV_list.SVlist_GalileoE1                               =   [acq_info.SV_list.SVlist_GalileoE1 GNSS_info.Meas(i).svid];
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).svid                  =   GNSS_info.Meas(i).svid;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).state                 =   GNSS_info.Meas(i).state;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).carrierFreq           =   GNSS_info.Meas(i).carrierFrequencyHz;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx                  =   GNSS_info.Meas(i).receivedSvTimeNanos + GNSS_info.Meas(i).timeOffsetNanos;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx              	=   mod(acq_info.nsGNSSTime, 604800e9);
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).pseudorangeRate       =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).CN0                   =   GNSS_info.Meas(i).cn0DbHz;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).phase                 =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).phaseState            =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+%                         acq_info.SV.Galileo.GalileoE1(nGalileoE1).p                     =   pseudo_gen(acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_tx, acq_info.SV.Galileo.GalileoE1(nGalileoE1).t_rx, c);
+%                         nGalileoE1                                                      =   nGalileoE1 + 1;
+%                     else
+%                         acq_info.SV_list.SVlist_GalileoE5a                              =   [acq_info.SV_list.SVlist_GalileoE5a GNSS_info.Meas(i).svid];
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).svid                =   GNSS_info.Meas(i).svid;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).state           	=   GNSS_info.Meas(i).state;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).carrierFreq         =   GNSS_info.Meas(i).carrierFrequencyHz;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx                =   GNSS_info.Meas(i).receivedSvTimeNanos  + GNSS_info.Meas(i).timeOffsetNanos;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx              	=   mod(acq_info.nsGNSSTime, 604800e9);
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).pseudorangeRate     =   GNSS_info.Meas(i).pseudorangeRateMetersPerSecond;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).CN0                 =   GNSS_info.Meas(i).cn0DbHz;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phase               =   GNSS_info.Meas(i).accumulatedDeltaRangeMeters;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).phaseState          =   GNSS_info.Meas(i).accumulatedDeltaRangeState;
+%                         acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).p                   =   pseudo_gen(acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_tx, acq_info.SV.Galileo.GalileoE5a(nGalileoE5a).t_rx, c);
+%                         nGalileoE5a                                                     =   nGalileoE5a + 1;     
+%                     end
                 end
             end
         otherwise
@@ -319,6 +348,7 @@ for i=1:length(GNSS_info.ephData.Galileo)
     % E1
     for j=1:nGalileoE1
         if acq_info.SV.Galileo.GalileoE1(j).svid == GNSS_info.ephData.Galileo(i).svid
+            acq_info.SV.Galileo.GalileoE1(j).isINav                         =   GNSS_info.ephData.Galileo(i).isINav;
             acq_info.SV.Galileo.GalileoE1(j).TOW                          =   GNSS_info.ephData.Galileo(i).tocS;
             acq_info.SV.Galileo.GalileoE1(j).NOW                          =   GNSS_info.ephData.Galileo(i).week;
             acq_info.SV.Galileo.GalileoE1(j).af0                          =   GNSS_info.ephData.Galileo(i).af0S;
@@ -349,30 +379,33 @@ for i=1:length(GNSS_info.ephData.Galileo)
     % E5a
     for j=1:nGalileoE5a
         if acq_info.SV.Galileo.GalileoE5a(j).svid == GNSS_info.ephData.Galileo(i).svid
-            acq_info.SV.Galileo.GalileoE5a(j).TOW                          =   GNSS_info.ephData.Galileo(i).tocS;
-            acq_info.SV.Galileo.GalileoE5a(j).NOW                          =   GNSS_info.ephData.Galileo(i).week;
-            acq_info.SV.Galileo.GalileoE5a(j).af0                          =   GNSS_info.ephData.Galileo(i).af0S;
-            acq_info.SV.Galileo.GalileoE5a(j).af1                          =   GNSS_info.ephData.Galileo(i).af1SecPerSec;
-            acq_info.SV.Galileo.GalileoE5a(j).af2                          =   GNSS_info.ephData.Galileo(i).af2SecPerSec2;
-            acq_info.SV.Galileo.GalileoE5a(j).tgdS                         =   GNSS_info.ephData.Galileo(i).tgdS;
-            
-            % Kepler Model
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cic              =   GNSS_info.ephData.Galileo(i).keplerModel.cic;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cis              =   GNSS_info.ephData.Galileo(i).keplerModel.cis;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.crc              =   GNSS_info.ephData.Galileo(i).keplerModel.crc;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.crs              =   GNSS_info.ephData.Galileo(i).keplerModel.crs;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cuc              =   GNSS_info.ephData.Galileo(i).keplerModel.cuc;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cus              =   GNSS_info.ephData.Galileo(i).keplerModel.cus;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.deltaN           =   GNSS_info.ephData.Galileo(i).keplerModel.deltaN;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.eccentricity     =   GNSS_info.ephData.Galileo(i).keplerModel.eccentricity;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.i0               =   GNSS_info.ephData.Galileo(i).keplerModel.i0;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.iDot             =   GNSS_info.ephData.Galileo(i).keplerModel.iDot;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.m0               =   GNSS_info.ephData.Galileo(i).keplerModel.m0;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omega            =   GNSS_info.ephData.Galileo(i).keplerModel.omega;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omega0           =   GNSS_info.ephData.Galileo(i).keplerModel.omega0;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omegaDot         =   GNSS_info.ephData.Galileo(i).keplerModel.omegaDot;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.sqrtA            =   GNSS_info.ephData.Galileo(i).keplerModel.sqrtA;
-            acq_info.SV.Galileo.GalileoE5a(j).keplerModel.toeS             =   GNSS_info.ephData.Galileo(i).keplerModel.toeS;
+            if GNSS_info.ephData.Galileo(i).isINav == true
+                acq_info.SV.Galileo.GalileoE5a(j).isINav                       =   GNSS_info.ephData.Galileo(i).isINav;
+                acq_info.SV.Galileo.GalileoE5a(j).TOW                          =   GNSS_info.ephData.Galileo(i).tocS;
+                acq_info.SV.Galileo.GalileoE5a(j).NOW                          =   GNSS_info.ephData.Galileo(i).week;
+                acq_info.SV.Galileo.GalileoE5a(j).af0                          =   GNSS_info.ephData.Galileo(i).af0S;
+                acq_info.SV.Galileo.GalileoE5a(j).af1                          =   GNSS_info.ephData.Galileo(i).af1SecPerSec;
+                acq_info.SV.Galileo.GalileoE5a(j).af2                          =   GNSS_info.ephData.Galileo(i).af2SecPerSec2;
+                acq_info.SV.Galileo.GalileoE5a(j).tgdS                         =   GNSS_info.ephData.Galileo(i).tgdS;
+
+                % Kepler Model
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cic              =   GNSS_info.ephData.Galileo(i).keplerModel.cic;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cis              =   GNSS_info.ephData.Galileo(i).keplerModel.cis;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.crc              =   GNSS_info.ephData.Galileo(i).keplerModel.crc;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.crs              =   GNSS_info.ephData.Galileo(i).keplerModel.crs;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cuc              =   GNSS_info.ephData.Galileo(i).keplerModel.cuc;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.cus              =   GNSS_info.ephData.Galileo(i).keplerModel.cus;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.deltaN           =   GNSS_info.ephData.Galileo(i).keplerModel.deltaN;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.eccentricity     =   GNSS_info.ephData.Galileo(i).keplerModel.eccentricity;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.i0               =   GNSS_info.ephData.Galileo(i).keplerModel.i0;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.iDot             =   GNSS_info.ephData.Galileo(i).keplerModel.iDot;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.m0               =   GNSS_info.ephData.Galileo(i).keplerModel.m0;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omega            =   GNSS_info.ephData.Galileo(i).keplerModel.omega;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omega0           =   GNSS_info.ephData.Galileo(i).keplerModel.omega0;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.omegaDot         =   GNSS_info.ephData.Galileo(i).keplerModel.omegaDot;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.sqrtA            =   GNSS_info.ephData.Galileo(i).keplerModel.sqrtA;
+                acq_info.SV.Galileo.GalileoE5a(j).keplerModel.toeS             =   GNSS_info.ephData.Galileo(i).keplerModel.toeS;
+            end
         end
     end
 end

@@ -1,8 +1,8 @@
-function valid = check_GPSstate(state)
+function valid = check_TOWstate(state)
 
     b_state = de2bi(state, 16);
     
-    if (b_state(2) && b_state(4)) || b_state(15)
+    if b_state(4)
         valid = 1;
     else
         valid = 0;

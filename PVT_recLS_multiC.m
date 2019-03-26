@@ -1,4 +1,4 @@
-function    [PVT, DOP, Corr]  =   PVT_recLS_multiC(acq_info, eph)
+function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
 % PVT_recLS:    Computation of the receiver position at time TOW from  
 %               pseudoranges (pr) and ephemerides information (eph). 
 %               Implementation using the iterative Least-Squares principle 
@@ -23,6 +23,9 @@ function    [PVT, DOP, Corr]  =   PVT_recLS_multiC(acq_info, eph)
     GPS_ionoCorr        =   0;
     Galileo_tropoCorr   =   0;
     Galileo_ionoCorr    =   0;
+    error.flag          =   0;
+    error.text          =   '';
+    e_t                 =   0;
     
     %% LS loop
     for iter = 1:Nit
@@ -295,13 +298,29 @@ function    [PVT, DOP, Corr]  =   PVT_recLS_multiC(acq_info, eph)
             DOP             =   [GDOP, PDOP, TDOP];
             Corr.GPS        =   [GPS_ionoCorr GPS_tropoCorr];
             Corr.Galileo    =   [Galileo_ionoCorr Galileo_tropoCorr];
+            NS              =   size(G, 1);
         else
+            error.flag = 1;
+            error.text = 'Not enough satellites';
             PVT     =   [0 0 0 0];
             DOP   	=   [];
             Corr    =   [];
+            NS      =   0;
         end
         %
     end
+     
+    % Trick: don't accept executions with an error exceeding a fixed
+    % threshold
+%     e_t = sqrt((acq_info.refLocation.XYZ(1)-PVT(1))^2 + (acq_info.refLocation.XYZ(2)-PVT(2))^2 + (acq_info.refLocation.XYZ(3)-PVT(3))^2);
+%     if e_t > 1000
+%         error.flag = 1;
+%         error.text = 'Bad data';
+%         PVT     =   [0 0 0 0];
+%         DOP   	=   [];
+%         Corr    =   [];
+%         NS      =   0;
+%     end
     
 
 end
