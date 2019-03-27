@@ -1,8 +1,6 @@
 function E1C_2 = check_Galstate(state)
 
-    b_state = de2bi(state, 16);
-    
-    if b_state(12)
+    if bitand(state, 2^11)
         E1C_2 = 1;
     else
         E1C_2 = 0;

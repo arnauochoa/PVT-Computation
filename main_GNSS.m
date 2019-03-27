@@ -22,51 +22,6 @@ for i=1:length(GNSS_info)
     for j=1:length(GNSS_info(i).Params)
         %% Create acquisition struct from GNSS_info
         acq_info        =   extract_info(GNSS_info(i), j);
-        acq_infos(i) = acq_info;
-%         o_x = [];
-%         p_y = [];
-%         for o=1:length(acq_info.SV.Galileo.GalileoE1)
-%             o_x = [o_x o]; 
-%             p_y = [p_y acq_info.SV.Galileo.GalileoE1(o).p];
-%         end
-%         
-%         figure
-%         plot(o_x, p_y, 'o-')
-%         title(sprintf('%G', i))
-
-    % Trying to plot the pseudoranges
-    ss_t = [];
-        if i == length(GNSS_info)
-            o_x = [];
-            p_y = [];
-            for k=1:length(acq_infos)
-                %for o=1:length(acq_infos(k).SV.Galileo.GalileoE5a)
-                    o_x = [o_x acq_infos(k).SV.Galileo.GalileoE5a.svid]; 
-                    p_y = [p_y acq_infos(k).SV.Galileo.GalileoE5a.p];
-                %end
-            end
-            p_t = [o_x; p_y];
-            
-            for ss=1:length(p_t)
-                ss_p = p_t(1,ss);
-                a = find(p_t(1,:) == ss_p);
-                for g=1:length(a)
-                    ss_t = [ss_t p_t(:, a(g))];
-                end   
-            end
-            ss_t = ss_t(:, 1:length(p_t));
-        end
-        
-%         o_x = [];
-%         p_y = [];
-%         for o=1:length(acq_info.SV.Galileo.GalileoE5a)
-%             o_x = [o_x o]; 
-%             p_y = [p_y acq_info.SV.Galileo.GalileoE5a(o).p];
-%         end
-%         
-%         stem(o_x, p_y, 'o-')
-%         title(sprintf('%G', i))
-%         hold on
 
         %% Some initializations
         PVT0        =   acq_info.refLocation.XYZ;  % Preliminary guess for PVT solution     
@@ -77,13 +32,18 @@ for i=1:length(GNSS_info)
         acq_info.flags.constellations.GPSL1        	=   0;
         acq_info.flags.constellations.GPSL5        	=   0;
         acq_info.flags.constellations.Galileo    	=   1;
-        acq_info.flags.constellations.GalileoE1    	=   1;
-        acq_info.flags.constellations.GalileoE5a   	=   0;
+        acq_info.flags.constellations.GalileoE1    	=   0;
+        acq_info.flags.constellations.GalileoE5a   	=   1;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   0;
         acq_info.flags.algorithm.WLS                =   0;
         acq_info.flags.corrections.f2corr           =   0;
+        
+        % Mask config
+        acq_info.flags.algorithm.mask.flag        	=   1;
+        acq_info.flags.algorithm.mask.type        	=   [1];
+        acq_info.flags.algorithm.mask.value        	=   [20];
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';
@@ -98,11 +58,12 @@ for i=1:length(GNSS_info)
         end
 
         %% Masks application
-        maskType = 0; % 1 = elevation, 2 = CN0
-        maskValue = 15; % degrees or dBHz
-
-        if maskType ~= 0
-            acq_info = apply_mask(acq_info, maskType, maskValue);
+        if acq_info.flags.algorithm.mask.flag
+            for z=1:length(acq_info.flags.algorithm.mask.type)
+                maskType    =   acq_info.flags.algorithm.mask.type(z);
+                maskValue   =   acq_info.flags.algorithm.mask.value(z);
+                acq_info    =   apply_mask(acq_info, maskType, maskValue);
+            end
         end
 
         %% It is needed to download a navigation message to obtain ephemerides
@@ -141,11 +102,17 @@ for i=1:length(GNSS_info)
 end
     
     % Delete results = 0 (bad results or not enough satellites)
-    for l=1:size(results, 1)
-       if results(1, :, :) == 0
-           results(1, :, :) = [];
+    tmp = [];
+    for i=1:size(results, 1)
+       if results(i, :, :) == 0
+           tmp = [tmp i];
        end
     end
+    tmp = fliplr(tmp);
+    for i=1:length(tmp)
+        results(tmp(i), :, :) = [];
+    end
+    
     %% PVT Averaging
     if ~isempty(results) 
         for i=1:size(results, 2)
@@ -258,3 +225,49 @@ end
 %         end
 %     end
 %end
+
+%         o_x = [];
+%         p_y = [];
+%         for o=1:length(acq_info.SV.Galileo.GalileoE1)
+%             o_x = [o_x o]; 
+%             p_y = [p_y acq_info.SV.Galileo.GalileoE1(o).p];
+%         end
+%         
+%         figure
+%         plot(o_x, p_y, 'o-')
+%         title(sprintf('%G', i))
+
+    %    acq_infos(i) = acq_info;
+    % Trying to plot the pseudoranges
+%     ss_t = [];
+%         if i == length(GNSS_info)
+%             o_x = [];
+%             p_y = [];
+%             for k=1:length(acq_infos)
+%                 %for o=1:length(acq_infos(k).SV.Galileo.GalileoE5a)
+%                     o_x = [o_x acq_infos(k).SV.Galileo.GalileoE5a.svid]; 
+%                     p_y = [p_y acq_infos(k).SV.Galileo.GalileoE5a.p];
+%                 %end
+%             end
+%             p_t = [o_x; p_y];
+%             
+%             for ss=1:length(p_t)
+%                 ss_p = p_t(1,ss);
+%                 a = find(p_t(1,:) == ss_p);
+%                 for g=1:length(a)
+%                     ss_t = [ss_t p_t(:, a(g))];
+%                 end   
+%             end
+%             ss_t = ss_t(:, 1:length(p_t));
+%         end
+        
+%         o_x = [];
+%         p_y = [];
+%         for o=1:length(acq_info.SV.Galileo.GalileoE5a)
+%             o_x = [o_x o]; 
+%             p_y = [p_y acq_info.SV.Galileo.GalileoE5a(o).p];
+%         end
+%         
+%         stem(o_x, p_y, 'o-')
+%         title(sprintf('%G', i))
+%         hold on

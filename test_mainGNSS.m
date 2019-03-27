@@ -6,12 +6,8 @@ close all
 clear all
 
 %% Choosing data  
-% 536 to 636 works
-% 637 to 797 does not work
-% 801 yo 852 works
-% 854 to 907 works
-opmin   =   220;
-opmax	=   300;
+opmin   =   637;
+opmax	=   797;
 
 for op=opmin:opmax
     
