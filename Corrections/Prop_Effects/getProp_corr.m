@@ -1,4 +1,4 @@
-function    [tropoCorr, ionoCorr]     =   getProp_corr(X,pos,iono,TOW)
+function    [tropoCorr, ionoCorr,eL]     =   getProp_corr(X,pos,iono,TOW)
 % getProp_tcorr:  Get propagation effects correction.  
 %
 % Inputs:
@@ -10,8 +10,12 @@ function    [tropoCorr, ionoCorr]     =   getProp_corr(X,pos,iono,TOW)
 %           - TOW:      TOW of the epoch to analyze
 %
 % Outputs:
-%           - T:        Propagation effects correction [m] for the 
-%                       satellite with position given by X at time TOW
+%           - tropoCorr:    Tropospheric effects correction [m] for the 
+%                           satellite with position given by X at time TOW
+%           - ionoCorr:     Ionospheric effects correction [m] for the 
+%                           satellite with position given by X at time TOW
+%           - eL:           Satellite elevations (tropospheric) for the 
+%                           satellite with position given by X at time TOW
 %
 
 %

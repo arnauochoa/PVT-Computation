@@ -80,7 +80,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 %% GPS corrections
                 % GPS satellite coordinates and time correction (always applying)
                 if (iter == 1)
-                    [GPS_X(:, sat), GPS_tcorr(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.TOW, GPS_pr(sat));
+                    [GPS_X(:, sat), GPS_tcorr(sat),eLGPS(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.TOW, GPS_pr(sat));
                 end
                 GPS_corr                =   c * GPS_tcorr(sat);
                 
@@ -144,6 +144,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
             emptysat         = []; 
         else
             GPS_A           =   [];
+            GPS_X           =   [];
             GPS_p           =   [];
             GPS_CN0         =   [];
             GPS_tcorr       =   [];
@@ -158,6 +159,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 if acq_info.flags.constellations.GalileoE1
                     nGalileo            =   length(acq_info.SV.Galileo.GalileoE1);
                     Galileo_A           =   zeros(nGalileo, 3);
+                    Galileo_X           =   zeros(nGalileo,3)';
                     Galileo_p           =   zeros(nGalileo, 1);
                     %tcorr       =   zeros(nGalileo, 1);
                     %Pcorr       =   zeros(nGalileo, 1);
@@ -178,6 +180,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 if acq_info.flags.constellations.GalileoE5a
                     nGalileo            = length(acq_info.SV.Galileo.GalileoE5a);
                     Galileo_A           =   zeros(nGalileo, 3);
+                    Galileo_X           =   zeros(nGalileo,3)';
                     Galileo_p           =   zeros(nGalileo, 1);
                     %tcorr       =   zeros(nGalileo, 1);
                     %Pcorr       =   zeros(nGalileo, 1);
@@ -301,6 +304,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
             emptysat         = [];
         else
             Galileo_A           =   [];
+            Galileo_X           =   [];
             Galileo_p           =   [];
             Galileo_CN0         =   [];
             Galileo_tcorr       =   [];
@@ -313,21 +317,48 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
             if acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo
                 GPS_A       =   [GPS_A zeros(size(GPS_A, 1), 1)];
                 Galileo_A   =   [Galileo_A ones(size(Galileo_A, 1), 1)];
+                
             end
         end
         
         % Multiconstellation unions
-        G       =   [GPS_A; Galileo_A];
-        p       =   [GPS_p; Galileo_p];
-        CN0     =   [GPS_CN0 Galileo_CN0];
+        G           =   [GPS_A; Galileo_A];
+        p           =   [GPS_p; Galileo_p];
+        CN0         =   [GPS_CN0 Galileo_CN0];
+        Sat_X       =   [GPS_X;Galileo_X];
+        for ii = 1:length(p)
+            [~, eL(ii), ~]      =   topocent(PVT(1:3),Sat_X(:,ii));    % Satellite azimuth and elevation
+        end
+        %- Apply Mask -%
+        if  acq_info.flags.algorithm.mask.flag
+%             type        =   acq_info.flags.algorithm.mask.type;
+% De momento s?lo aplico por elevaci?n
+%
+            maskVal     =   acq_info.flags.algorithm.mask.value;
+            idx         =   eL > maskVal;
+            G       =   G(idx,:);
+            p       =   p(idx);
+            CN0     =   CN0(idx);
+%             Sat_X   =   Sat_X(idx,:);
+            eL      =   eL(idx);            
+        end        
         
         %% Add last column  
         G = [G ones(size(G, 1), 1)];
+        %- Get rid off outliers -%
+        tmp     =   p<1e5;
+        G       =   G(tmp,:);
+%         W       =   W(tmp,tmp);
+        p       =   p(tmp);
+        CN0     =   CN0(tmp);
+%             Sat_X   =   Sat_X(idx,:);
+        eL      =   eL(tmp); 
+        %
         
         if size(G, 1) >= (3 + acq_info.flags.constellations.GPS + acq_info.flags.constellations.Galileo)
             %% Weighting matrix
             if acq_info.flags.algorithm.WLS
-                W   =   compute_Wmatrix(CN0);
+                W   =   compute_Wmatrix(eL,CN0,1);
             else
                 W   =   eye(length(G));
             end
@@ -337,20 +368,30 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
             d               =   H*G'*W*p;            % PVT update            
             %- Integrity Check (RAIM) -%
 %             if( iter == Nit )
-                resi            =   p-G*d;
-                SSE             =   sqrt((resi'*resi)/length(p)-4);   % Sum of Square Errors (SSE) for RAIM
-                while( SSE > 1e3 && length(p) > 4)
-                    [~,idx]     =   max(resi);
-                    idt         =   ~(1:length(p) == idx);
-                    p           =   p(idt);
-                    G           =   G(idt,:);
-                    W           =   W(idt,idt);
-                    H           =   inv(G'*W*G);
-                    d           =   H*G'*W*p;
-                    %
-                    resi        =   p - G*d;
-                    SSE         =   sqrt((resi'*resi)/(length(p)-4));
+                if( length(p) > 4 ) % Fault Exclusion
+                    resi            =   p-G*d;
+                    SSE             =   sqrt((resi'*resi)/length(p)-4);   % Sum of Square Errors (SSE) for RAIM
+                    while( SSE > 1e3 && length(p) > 4)
+                        [~,idx]     =   max(resi);
+                        idt         =   ~(1:length(p) == idx);
+                        p           =   p(idt);
+                        G           =   G(idt,:);
+                        W           =   W(idt,idt);
+                        H           =   inv(G'*W*G);
+                        d           =   H*G'*W*p;
+                        %
+                        resi        =   p - G*d;
+                        SSE         =   sqrt((resi'*resi)/(length(p)-4));
+                    end
+                else        % Fault detection --> PVT exclusion (i.e. nan)
+%                     resi            =   p-G*d;
+%                     SSE             =   sqrt((resi'*resi));   % Sum of Square Errors (SSE) for RAIM
+%                     if( SSE > 1e3 )
+%                         d           =   nan(4,1); % Ojo luego al promediar, al promediar trata de utilizar nanmean()
+%                     end
                 end
+                  
+                    
 %             end
             PVT(1:3)    =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
             PVT(4)      =   PVT(4) + d(4)/c;     % Update receiver clock offset
