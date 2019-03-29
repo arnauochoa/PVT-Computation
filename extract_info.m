@@ -31,7 +31,7 @@ else
     acq_info.nsGNSSTime =  (GNSS_info.Clock.timeNanos - (GNSS_info.Clock.fullBiasNanos));
 end
 [tow, now]      = nsgpst2gpst(acq_info.nsGNSSTime);
-acq_info.TOW    = mod(acq_info.nsGNSSTime, 604800e9)/1e9;
+acq_info.TOW    = floor(mod(acq_info.nsGNSSTime, 604800e9)/1e9);
 acq_info.NOW    = now;
 
 %% Measurements
