@@ -80,7 +80,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 %% GPS corrections
                 % GPS satellite coordinates and time correction (always applying)
                 if (iter == 1)
-                    [GPS_X(:, sat), GPS_tcorr(sat),eLGPS(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.TOW, GPS_pr(sat));
+                    [GPS_X(:, sat), GPS_tcorr(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.TOW, GPS_pr(sat));
                 end
                 GPS_corr                =   c * GPS_tcorr(sat);
                 

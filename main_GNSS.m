@@ -28,22 +28,22 @@ for i=1:length(GNSS_info)
         c           =   299792458;       %   Speed of light (m/s)
 
         %% Hardcoded for testing (in order not to modify the files directly)
-        acq_info.flags.constellations.GPS           =   0;
-        acq_info.flags.constellations.GPSL1        	=   0;
+        acq_info.flags.constellations.GPS           =   1;
+        acq_info.flags.constellations.GPSL1        	=   1;
         acq_info.flags.constellations.GPSL5        	=   0;
-        acq_info.flags.constellations.Galileo    	=   1;
-        acq_info.flags.constellations.GalileoE1    	=   1;
+        acq_info.flags.constellations.Galileo    	=   0;
+        acq_info.flags.constellations.GalileoE1    	=   0;
         acq_info.flags.constellations.GalileoE5a   	=   0;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
-        acq_info.flags.algorithm.LS                 =   0;
-        acq_info.flags.algorithm.WLS                =   1;
+        acq_info.flags.algorithm.LS                 =   1;
+        acq_info.flags.algorithm.WLS                =   09;
         acq_info.flags.corrections.f2corr           =   0;
         
         % Mask config
         acq_info.flags.algorithm.mask.flag        	=   0;
         acq_info.flags.algorithm.mask.type        	=   [1];
-        acq_info.flags.algorithm.mask.value        	=   [10];
+        acq_info.flags.algorithm.mask.value        	=   [15];
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';
