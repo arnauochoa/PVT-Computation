@@ -36,14 +36,14 @@ for i=1:length(GNSS_info)
         acq_info.flags.constellations.GalileoE5a   	=   0;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
-        acq_info.flags.algorithm.LS                 =   1;
-        acq_info.flags.algorithm.WLS                =   09;
+        acq_info.flags.algorithm.LS                 =   0;
+        acq_info.flags.algorithm.WLS                =   1;
         acq_info.flags.corrections.f2corr           =   0;
         
         % Mask config
-        acq_info.flags.algorithm.mask.flag        	=   0;
+        acq_info.flags.algorithm.mask.flag        	=   1;
         acq_info.flags.algorithm.mask.type        	=   [1];
-        acq_info.flags.algorithm.mask.value        	=   [15];
+        acq_info.flags.algorithm.mask.value        	=   [30];
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';
@@ -58,13 +58,13 @@ for i=1:length(GNSS_info)
         end
 
         %% Masks application
-        if acq_info.flags.algorithm.mask.flag
-            for z=1:length(acq_info.flags.algorithm.mask.type)
-                maskType    =   acq_info.flags.algorithm.mask.type(z);
-                maskValue   =   acq_info.flags.algorithm.mask.value(z);
-                acq_info    =   apply_mask(acq_info, maskType, maskValue);
-            end
-        end
+%         if acq_info.flags.algorithm.mask.flag
+%             for z=1:length(acq_info.flags.algorithm.mask.type)
+%                 maskType    =   acq_info.flags.algorithm.mask.type(z);
+%                 maskValue   =   acq_info.flags.algorithm.mask.value(z);
+%                 acq_info    =   apply_mask(acq_info, maskType, maskValue);
+%             end
+%         end
 
         %% It is needed to download a navigation message to obtain ephemerides
         % since they nav_msg is not always available
