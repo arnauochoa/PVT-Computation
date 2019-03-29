@@ -100,14 +100,23 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 end
                 
                 % Ionosphere correction based on dual frequency
-                if iter == 1
-                    if acq_info.flags.corrections.f2corr
-                     	[GPS_prcorr2f GPS_phcorr2f GPS_idx]   =   getIonoCorrDualFreq(acq_info.SV.GPS);
-
-                        for i=1:length(GPS_idx)
-                            GPS_pr(GPS_idx(i))   =   GPS_pr(GPS_idx(i)) + GPS_prcorr2f(i); 
+                if acq_info.flags.corrections.f2corr
+                    if iter == 1
+                        if acq_info.flags.constellations.GPSL1
+                            GPS_prcorr2f   =   getIonoCorrDualFreq(L5, L1, [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p], [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p]); % correction for E1
+                        else
+                            GPS_prcorr2f   =   getIonoCorrDualFreq(L1, L5, -[acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p], -[acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p]); % correction for E5a
                         end
+                        GPS_pr   =   GPS_pr - GPS_prcorr2f; 
                     end
+                end
+%                     if acq_info.flags.corrections.f2corr
+%                      	[GPS_prcorr2f GPS_phcorr2f GPS_idx]   =   getIonoCorrDualFreq(acq_info.SV.GPS);
+% 
+%                         for i=1:length(GPS_idx)
+%                             GPS_pr(GPS_idx(i))   =   GPS_pr(GPS_idx(i)) + GPS_prcorr2f(i); 
+%                         end
+%                     end
                 end
                             
                 % Corrections application
