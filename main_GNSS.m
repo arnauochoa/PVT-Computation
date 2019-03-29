@@ -36,12 +36,12 @@ for i=1:length(GNSS_info)
         acq_info.flags.constellations.GalileoE5a   	=   0;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
-        acq_info.flags.algorithm.LS                 =   0;
-        acq_info.flags.algorithm.WLS                =   1;
-        acq_info.flags.corrections.f2corr           =   0;
+        acq_info.flags.algorithm.LS                 =   1;
+        acq_info.flags.algorithm.WLS                =   0;
+        acq_info.flags.corrections.f2corr           =   1;
         
         % Mask config
-        acq_info.flags.algorithm.mask.flag        	=   1;
+        acq_info.flags.algorithm.mask.flag        	=   0;
         acq_info.flags.algorithm.mask.type        	=   [1];
         acq_info.flags.algorithm.mask.value        	=   [30];
 

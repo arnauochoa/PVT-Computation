@@ -2,7 +2,7 @@ function test_mainGNSS()
 
 tic
 
-% close all
+close all
 clear all
 clc;
 

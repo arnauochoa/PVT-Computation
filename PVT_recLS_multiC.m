@@ -101,14 +101,14 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 
                 % Ionosphere correction based on dual frequency
                 if acq_info.flags.corrections.f2corr
-                    if iter == 1
+%                     if iter == 1
                         if acq_info.flags.constellations.GPSL1
-                            GPS_prcorr2f   =   getIonoCorrDualFreq(L5, L1, [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p], [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p]); % correction for E1
+                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1176.45e6, 1575.42e6, [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p], [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p]); % correction for E1
                         else
-                            GPS_prcorr2f   =   getIonoCorrDualFreq(L1, L5, -[acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p], -[acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p]); % correction for E5a
+                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq( 1575.42e6, 1176.45e6, -[acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p], -[acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p]); % correction for E5a
                         end
-                        GPS_pr   =   GPS_pr - GPS_prcorr2f; 
-                    end
+                        GPS_pr   =   GPS_pr - GPS_prcorr2f(sat) + c * GPS_tcorr(sat); 
+%                     end
                 end
 %                     if acq_info.flags.corrections.f2corr
 %                      	[GPS_prcorr2f GPS_phcorr2f GPS_idx]   =   getIonoCorrDualFreq(acq_info.SV.GPS);
@@ -117,10 +117,13 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
 %                             GPS_pr(GPS_idx(i))   =   GPS_pr(GPS_idx(i)) + GPS_prcorr2f(i); 
 %                         end
 %                     end
-                end
+%                 end
                             
                 % Corrections application
-                GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
+                tmp         =   find(ncomm == GPS_svn(sat),1);
+                if( ~isempty(tmp) )
+                    GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
+                end
                 
                 %% GPS geometric matrix generation
                 if (~isnan(GPS_pr_c))    % Fill as long as there is C1 measurement,
@@ -175,16 +178,17 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                     %X           =   zeros(3, nGalileo);
                     Galileo_pr1          =   [];
                     Galileo_svn1         =   [];
-                    Galileo_CN0         =   [];
+                    Galileo_CN01         =   [];
                     for i=1:nGalileo
                         Galileo_pr1      =   [Galileo_pr1 acq_info.SV.Galileo.GalileoE1(i).p];
                         Galileo_svn1     =   [Galileo_svn1 acq_info.SV.Galileo.GalileoE1(i).svid];
-                        Galileo_CN0     =   [Galileo_CN0 acq_info.SV.Galileo.GalileoE1(i).CN0];
+                        Galileo_CN01     =   [Galileo_CN01 acq_info.SV.Galileo.GalileoE1(i).CN0];
                     end
                     Galileo_eph1         =   eph.GalileoE1;
                     Galileo_pr          =   Galileo_pr1;
                     Galileo_svn         =   Galileo_svn1;
                     Galileo_eph     =   Galileo_eph1;
+                    Galileo_CN0     =   Galileo_CN01;
                 end
                 if acq_info.flags.constellations.GalileoE5a
                     nGalileo            = length(acq_info.SV.Galileo.GalileoE5a);
@@ -196,27 +200,30 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                     %X           =   zeros(3, nGalileo);
                     Galileo_pr2          =   [];
                     Galileo_svn2         =   [];
-                    Galileo_CN0         =   [];
+                    Galileo_CN02         =   [];
                     for i=1:nGalileo
                         Galileo_pr2      =   [Galileo_pr2 acq_info.SV.Galileo.GalileoE5a(i).p];
                         Galileo_svn2     =   [Galileo_svn2 acq_info.SV.Galileo.GalileoE5a(i).svid];
-                        Galileo_CN0     =   [Galileo_CN0 acq_info.SV.Galileo.GalileoE5a(i).CN0];
+                        Galileo_CN02     =   [Galileo_CN02 acq_info.SV.Galileo.GalileoE5a(i).CN0];
                     end
                     Galileo_eph2         =   eph.GalileoE5a;
                     Galileo_pr          =   Galileo_pr2;
                     Galileo_svn         =   Galileo_svn2;
                     Galileo_eph     =   Galileo_eph2;
+                    Galileo_CN0     =   Galileo_CN02;
                 end
                 if(acq_info.flags.constellations.GalileoE1 && acq_info.flags.constellations.GalileoE5a)
                    [flg,i1,i5]            =   intersect(Galileo_svn1,Galileo_svn2); 
                    ttt              =   Galileo_svn2(i5);
                    pr           =   Galileo_pr2(i5);
+                   CN0          =   Galileo_CN02(i5);
                    N2           =   length(ttt);
                    if(N2 ~= length(Galileo_svn2))
                        aa       =   setdiff(Galileo_svn2,Galileo_svn1);
                        for ii =1:length(aa) 
                            ttt      =   [ttt aa(ii)];
                            pr       =   [pr Galileo_pr2(Galileo_svn2==aa(ii))];
+                           CN0      =   [CN0 Galileo_CN02(Galileo_svn2==aa(ii))];
                        end
                        N2       =   length(ttt);
                    end 
@@ -225,6 +232,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                        for ii = 1:length(aa)
                            ttt          =   [ttt aa(ii)];
                            pr           =   [pr Galileo_pr1(Galileo_svn1==aa(ii))];
+                           CN0          =   [CN0 Galileo_CN01(Galileo_svn1==aa(ii))];
                        end
                        N1           =   length(aa);
                        eph_idx      =   [2*ones(N2,1);ones(N1,1)]; 
@@ -233,8 +241,9 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                    end
                        
                    nGalileo     =   length(pr);
-                   Galileo_pr      =   pr;
-                    Galileo_svn     =   ttt;
+                   Galileo_pr   =   pr;
+                   Galileo_svn  =   ttt;
+                   Galileo_CN0  =   CN0;
                 end
                 
             end
