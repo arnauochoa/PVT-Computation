@@ -2,14 +2,16 @@ function test_mainGNSS()
 
 tic
 
-close all
+% close all
 clear all
+clc;
 
 %% Choosing data  
-opmin   =   637;
-opmax	=   797;
+opmin   =   637;%646;
+opmax	=   797;%698;
 
 for op=opmin:opmax
+%     op
     
     %% Get JSON filename 
     json_fn = getJSONfn(op);

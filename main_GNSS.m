@@ -17,7 +17,7 @@ GNSS_info       = jsondecode(json_content);
 
 %% Averaging loop 
 for i=1:length(GNSS_info)
-    
+%     i
     %% Executions with different configurations
     for j=1:length(GNSS_info(i).Params)
         %% Create acquisition struct from GNSS_info
@@ -34,16 +34,16 @@ for i=1:length(GNSS_info)
         acq_info.flags.constellations.Galileo    	=   1;
         acq_info.flags.constellations.GalileoE1    	=   0;
         acq_info.flags.constellations.GalileoE5a   	=   1;
-        acq_info.flags.corrections.ionosphere       =   1;
-        acq_info.flags.corrections.troposphere      =   1;
-        acq_info.flags.algorithm.LS                 =   0;
+        acq_info.flags.corrections.ionosphere       =   0;
+        acq_info.flags.corrections.troposphere      =   0;
+        acq_info.flags.algorithm.LS                 =   1;
         acq_info.flags.algorithm.WLS                =   0;
         acq_info.flags.corrections.f2corr           =   0;
         
         % Mask config
-        acq_info.flags.algorithm.mask.flag        	=   1;
+        acq_info.flags.algorithm.mask.flag        	=   0;
         acq_info.flags.algorithm.mask.type        	=   [1];
-        acq_info.flags.algorithm.mask.value        	=   [20];
+        acq_info.flags.algorithm.mask.value        	=   [10];
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';

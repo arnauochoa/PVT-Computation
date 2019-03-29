@@ -29,6 +29,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
     
     %% LS loop
     for iter = 1:Nit
+%         iter
         % Declarations
         if (iter == 1)
             PVT     =   [acq_info.refLocation.XYZ 0];
@@ -155,44 +156,89 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
             if (iter == 1)
                 
                 if acq_info.flags.constellations.GalileoE1
-                    nGalileo            = length(acq_info.SV.Galileo.GalileoE1);
+                    nGalileo            =   length(acq_info.SV.Galileo.GalileoE1);
                     Galileo_A           =   zeros(nGalileo, 3);
                     Galileo_p           =   zeros(nGalileo, 1);
                     %tcorr       =   zeros(nGalileo, 1);
                     %Pcorr       =   zeros(nGalileo, 1);
                     %X           =   zeros(3, nGalileo);
-                    Galileo_pr          =   [];
-                    Galileo_svn         =   [];
+                    Galileo_pr1          =   [];
+                    Galileo_svn1         =   [];
                     Galileo_CN0         =   [];
                     for i=1:nGalileo
-                        Galileo_pr      =   [Galileo_pr acq_info.SV.Galileo.GalileoE1(i).p];
-                        Galileo_svn     =   [Galileo_svn acq_info.SV.Galileo.GalileoE1(i).svid];
+                        Galileo_pr1      =   [Galileo_pr1 acq_info.SV.Galileo.GalileoE1(i).p];
+                        Galileo_svn1     =   [Galileo_svn1 acq_info.SV.Galileo.GalileoE1(i).svid];
                         Galileo_CN0     =   [Galileo_CN0 acq_info.SV.Galileo.GalileoE1(i).CN0];
                     end
-                    Galileo_eph         =   eph.GalileoE1;
-                else
+                    Galileo_eph1         =   eph.GalileoE1;
+                    Galileo_pr          =   Galileo_pr1;
+                    Galileo_svn         =   Galileo_svn1;
+                    Galileo_eph     =   Galileo_eph1;
+                end
+                if acq_info.flags.constellations.GalileoE5a
                     nGalileo            = length(acq_info.SV.Galileo.GalileoE5a);
                     Galileo_A           =   zeros(nGalileo, 3);
                     Galileo_p           =   zeros(nGalileo, 1);
                     %tcorr       =   zeros(nGalileo, 1);
                     %Pcorr       =   zeros(nGalileo, 1);
                     %X           =   zeros(3, nGalileo);
-                    Galileo_pr          =   [];
-                    Galileo_svn         =   [];
+                    Galileo_pr2          =   [];
+                    Galileo_svn2         =   [];
                     Galileo_CN0         =   [];
                     for i=1:nGalileo
-                        Galileo_pr      =   [Galileo_pr acq_info.SV.Galileo.GalileoE5a(i).p];
-                        Galileo_svn     =   [Galileo_svn acq_info.SV.Galileo.GalileoE5a(i).svid];
+                        Galileo_pr2      =   [Galileo_pr2 acq_info.SV.Galileo.GalileoE5a(i).p];
+                        Galileo_svn2     =   [Galileo_svn2 acq_info.SV.Galileo.GalileoE5a(i).svid];
                         Galileo_CN0     =   [Galileo_CN0 acq_info.SV.Galileo.GalileoE5a(i).CN0];
                     end
-                    Galileo_eph         =   eph.GalileoE5a;
+                    Galileo_eph2         =   eph.GalileoE5a;
+                    Galileo_pr          =   Galileo_pr2;
+                    Galileo_svn         =   Galileo_svn2;
+                    Galileo_eph     =   Galileo_eph2;
                 end
+                if(acq_info.flags.constellations.GalileoE1 && acq_info.flags.constellations.GalileoE5a)
+                   [flg,i1,i5]            =   intersect(Galileo_svn1,Galileo_svn2); 
+                   ttt              =   Galileo_svn2(i5);
+                   pr           =   Galileo_pr2(i5);
+                   N2           =   length(ttt);
+                   if(N2 ~= length(Galileo_svn2))
+                       aa       =   setdiff(Galileo_svn2,Galileo_svn1);
+                       for ii =1:length(aa) 
+                           ttt      =   [ttt aa(ii)];
+                           pr       =   [pr Galileo_pr2(Galileo_svn2==aa(ii))];
+                       end
+                       N2       =   length(ttt);
+                   end 
+                   aa           =   setdiff(Galileo_svn1,Galileo_svn2);
+                   if(~isempty(aa))
+                       for ii = 1:length(aa)
+                           ttt          =   [ttt aa(ii)];
+                           pr           =   [pr Galileo_pr1(Galileo_svn1==aa(ii))];
+                       end
+                       N1           =   length(aa);
+                       eph_idx      =   [2*ones(N2,1);ones(N1,1)]; 
+                   else
+                       eph_idx      =   2*ones(N2,1); 
+                   end
+                       
+                   nGalileo     =   length(pr);
+                   Galileo_pr      =   pr;
+                    Galileo_svn     =   ttt;
+                end
+                
             end
+            flag2               =   acq_info.flags.constellations.GalileoE1 && acq_info.flags.constellations.GalileoE5a;
             
             for sat = 1:nGalileo
                 %% Galileo corrections
                 % Galileo satellite coordinates and time correction (always applying)
                 if (iter == 1)  % Only 1st iteration
+                    if flag2
+                        if( sat<=N2 )
+                            Galileo_eph         =   Galileo_eph2;
+                        else
+                            Galileo_eph         =   Galileo_eph1;
+                        end
+                    end
                     [Galileo_X(:, sat), Galileo_tcorr(sat)]  =   getCtrl_corr(Galileo_eph, Galileo_svn(sat), acq_info.TOW, Galileo_pr(sat));
                 end
                 Galileo_corr                =   c * Galileo_tcorr(sat);
@@ -228,7 +274,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 if (~isnan(Galileo_pr_c))    % Fill as long as there is C1 measurement,
                                      % otherwise discard the measurement.
                     %--     Fill the measurement vector (rhoc_i - d0_i)
-                    Galileo_d0              = sqrt((Galileo_X(1,sat) - PVT(1))^2 + (Galileo_X(2,sat) - PVT(2))^2 + (Galileo_X(3,sat) - PVT(3))^2); %TODO: shorten
+                    Galileo_d0              =   sqrt((Galileo_X(1,sat) - PVT(1))^2 + (Galileo_X(2,sat) - PVT(2))^2 + (Galileo_X(3,sat) - PVT(3))^2); %TODO: shorten
                     Galileo_p(sat)          =   Galileo_pr_c - Galileo_d0;
                     %
                     %--     Fill the geometry matrix
@@ -288,10 +334,27 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
 
             %% LS corrections
             H               =   inv(G'*W*G);
-            d               =   H*G'*W*p;            % PVT update
-            PVT(1:3)        =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
-            PVT(4)          =   PVT(4) + d(4)/c;     % Update receiver clock offset
-            
+            d               =   H*G'*W*p;            % PVT update            
+            %- Integrity Check (RAIM) -%
+%             if( iter == Nit )
+                resi            =   p-G*d;
+                SSE             =   sqrt((resi'*resi)/length(p)-4);   % Sum of Square Errors (SSE) for RAIM
+                while( SSE > 1e3 && length(p) > 4)
+                    [~,idx]     =   max(resi);
+                    idt         =   ~(1:length(p) == idx);
+                    p           =   p(idt);
+                    G           =   G(idt,:);
+                    W           =   W(idt,idt);
+                    H           =   inv(G'*W*G);
+                    d           =   H*G'*W*p;
+                    %
+                    resi        =   p - G*d;
+                    SSE         =   sqrt((resi'*resi)/(length(p)-4));
+                end
+%             end
+            PVT(1:3)    =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
+            PVT(4)      =   PVT(4) + d(4)/c;     % Update receiver clock offset
+            %
             GDOP            =   sqrt(H(1,1) + H(2,2) + H(3,3) + H(4,4));
             PDOP            =   sqrt(H(1,1) + H(2,2) + H(3,3));
             TDOP            =   sqrt(H(4,4));
