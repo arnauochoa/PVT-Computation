@@ -255,14 +255,14 @@ for i=1:length(GNSS_info.Status)
     switch GNSS_info.Status(i).constellationType
         case 1
             for j=1:length(acq_info.SV_list.SVlist_GPSL1)
-                if acq_info.SV.GPS.GPSL1(j).svid == GNSS_info.Meas(i).svid
+                if acq_info.SV.GPS.GPSL1(j).svid == GNSS_info.Status(i).svid
                     acq_info.SV.GPS.GPSL1(j).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.GPS.GPSL1(j).Elevation            = GNSS_info.Status(i).elevationDegrees;
                     acq_info.SV.GPS.GPSL1(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
                 end
             end
             for j=1:length(acq_info.SV_list.SVlist_GPSL5)
-                if acq_info.SV.GPS.GPSL5(j).svid == GNSS_info.Meas(i).svid
+                if acq_info.SV.GPS.GPSL5(j).svid == GNSS_info.Status(i).svid
                     acq_info.SV.GPS.GPSL5(j).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.GPS.GPSL5(j).Elevation            = GNSS_info.Status(i).elevationDegrees;
                     acq_info.SV.GPS.GPSL5(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
