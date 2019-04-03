@@ -2,7 +2,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
 
     %% GPS
     if flags.constellations.GPS
-        GPS         =   SVinfo.GPS.GPSL1;
+        GPS         =   SVinfo.gpsSatellites.gpsL1;
         ephemerides     =   zeros(22, length(GPS));
 
         for i=1:length(GPS)
@@ -31,7 +31,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
         end
         eph.GPSL1 = ephemerides;
 
-        GPS         =   SVinfo.GPS.GPSL5;
+        GPS         =   SVinfo.gpsSatellites.gpsL5;
         ephemerides     =   zeros(22, length(GPS));
 
         for i=1:length(GPS)
@@ -63,9 +63,9 @@ function eph    =   getEphMatrix(SVinfo, flags)
 
 
 
-    %% Galileo
+    %% Galileo (ToDo !!!!)
     if flags.constellations.Galileo
-        Galileo         =   SVinfo.Galileo.GalileoE1;
+        Galileo         =   SVinfo.galSatellites.galE1;
         ephemerides     =   zeros(22, length(Galileo));
 
         for i=1:length(Galileo)
@@ -94,7 +94,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
         end
         eph.GalileoE1 = ephemerides;
 
-        Galileo         =   SVinfo.Galileo.GalileoE5a;
+        Galileo         =   SVinfo.galSatellites.galE5a;
         ephemerides     =   zeros(22, length(Galileo));
 
         for i=1:length(Galileo)

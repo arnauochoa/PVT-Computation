@@ -1819,5 +1819,9 @@ function json_fn = getJSONfn(option)
             json_fn         =   '25032019_190543/dataJson_54.txt';
         case 907
             json_fn         =   '25032019_190543/dataJson_55.txt';
+        case 908
+            json_fn         =   'New_Test/Wed Apr 03 18_07_46 GMT+02_00 2019.txt';
+        case 909
+            json_fn         =   'New_Test/tets_bar.txt';
     end
 end

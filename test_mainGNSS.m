@@ -1,4 +1,4 @@
-function test_mainGNSS()
+% function test_mainGNSS()
 
 tic
 
@@ -7,8 +7,8 @@ clear all
 clc;
 
 %% Choosing data  
-opmin   =   637;%646;
-opmax	=   797;%698;
+opmin   =   909;%637;%646;
+opmax	=   909;%797;%698;
 
 for op=opmin:opmax
 %     op
@@ -131,7 +131,7 @@ TOTALres_D3mean;
 
 toc
 
-end
+% end
 
 % plot(TOTALres((10-9):(33-9))) % geodesic
 % title('Geodesic tests')
