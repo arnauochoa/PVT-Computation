@@ -6,8 +6,8 @@ close all
 clear all
 
 %% Choosing data  
-opmin   =   641;
-opmax	=   740;
+opmin   =   637;
+opmax	=   797;
 
 for op=opmin:opmax
     

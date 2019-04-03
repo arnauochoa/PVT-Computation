@@ -258,14 +258,14 @@ for i=1:length(GNSS_info.Status)
                 if acq_info.SV.GPS.GPSL1(j).svid == GNSS_info.Status(i).svid
                     acq_info.SV.GPS.GPSL1(j).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.GPS.GPSL1(j).Elevation            = GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.GPS.GPSL1(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
+                    %acq_info.SV.GPS.GPSL1(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
                 end
             end
             for j=1:length(acq_info.SV_list.SVlist_GPSL5)
                 if acq_info.SV.GPS.GPSL5(j).svid == GNSS_info.Status(i).svid
                     acq_info.SV.GPS.GPSL5(j).Azimuth              = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.GPS.GPSL5(j).Elevation            = GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.GPS.GPSL5(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
+                    %acq_info.SV.GPS.GPSL5(j).OK                   = GNSS_info.Status(i).hasEphemerisData;
                 end
             end
         case 2
@@ -273,23 +273,23 @@ for i=1:length(GNSS_info.Status)
                 if acq_info.SV.SBAS(j).svid == GNSS_info.Meas(i).svid
                     acq_info.SV.SBAS(j).Azimuth             = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.SBAS(j).Elevation       	= GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.SBAS(j).OK                	= GNSS_info.Status(i).hasEphemerisData;
+                    %acq_info.SV.SBAS(j).OK                	= GNSS_info.Status(i).hasEphemerisData;
                 end
             end
         case 3
-            for j=1:length(acq_info.SV_list.SVlist_GLONASS)
-                if acq_info.SV.GLONASS(j).svid == GNSS_info.Meas(i).svid
-                    acq_info.SV.GLONASS(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
-                    acq_info.SV.GLONASS(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.GLONASS(j).OK               = GNSS_info.Status(i).hasEphemerisData;
-                end
-            end
+%             for j=1:length(acq_info.SV_list.SVlist_GLONASS)
+%                 if acq_info.SV.GLONASS(j).svid == GNSS_info.Meas(i).svid
+%                     acq_info.SV.GLONASS(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
+%                     acq_info.SV.GLONASS(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
+%                     %acq_info.SV.GLONASS(j).OK               = GNSS_info.Status(i).hasEphemerisData;
+%                 end
+%             end
         case 4
             for j=1:length(acq_info.SV_list.SVlist_QZSS)
                 if acq_info.SV.QZSS(j).svid == GNSS_info.Meas(i).svid
                     acq_info.SV.QZSS(j).Azimuth         	= GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.QZSS(j).Elevation        	= GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.QZSS(j).OK               	= GNSS_info.Status(i).hasEphemerisData;
+                    %acq_info.SV.QZSS(j).OK               	= GNSS_info.Status(i).hasEphemerisData;
                 end
             end
         case 5
@@ -297,7 +297,7 @@ for i=1:length(GNSS_info.Status)
                 if acq_info.SV.BEIDOU(j).svid == GNSS_info.Meas(i).svid
                     acq_info.SV.BEIDOU(j).Azimuth           = GNSS_info.Status(i).azimuthDegrees;
                     acq_info.SV.BEIDOU(j).Elevation         = GNSS_info.Status(i).elevationDegrees;
-                    acq_info.SV.BEIDOU(j).OK                = GNSS_info.Status(i).hasEphemerisData;
+                    %acq_info.SV.BEIDOU(j).OK                = GNSS_info.Status(i).hasEphemerisData;
                 end
             end
         case 6
@@ -320,7 +320,7 @@ for i=1:length(GNSS_info.Status)
                     if acq_info.SV.Galileo.GalileoE1(j).svid == GNSS_info.Status(i).svid
                         acq_info.SV.Galileo.GalileoE1(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
                         acq_info.SV.Galileo.GalileoE1(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
-                        acq_info.SV.Galileo.GalileoE1(j).OK               = GNSS_info.Status(i).hasEphemerisData;
+                        %acq_info.SV.Galileo.GalileoE1(j).OK               = GNSS_info.Status(i).hasEphemerisData;
                     end
                 end
             else
@@ -328,7 +328,7 @@ for i=1:length(GNSS_info.Status)
                     if acq_info.SV.Galileo.GalileoE5a(j).svid == GNSS_info.Status(i).svid
                         acq_info.SV.Galileo.GalileoE5a(j).Azimuth          = GNSS_info.Status(i).azimuthDegrees;
                         acq_info.SV.Galileo.GalileoE5a(j).Elevation        = GNSS_info.Status(i).elevationDegrees;
-                        acq_info.SV.Galileo.GalileoE5a(j).OK               = GNSS_info.Status(i).hasEphemerisData;
+                        %acq_info.SV.Galileo.GalileoE5a(j).OK               = GNSS_info.Status(i).hasEphemerisData;
                     end
                 end
             end
