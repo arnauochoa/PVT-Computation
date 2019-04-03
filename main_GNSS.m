@@ -13,8 +13,9 @@ results  	=   [];
 av_results 	=   [];
 
 %% Build struct from JSON
-GNSS_info       = jsondecode(json_content);
+GNSS_info   =   jsondecode(json_content);
 PVT0        =   GNSS_info.refLocation.refLocationEcef;
+PVT0        =   [PVT0.x; PVT0.y; PVT0.z; 0];
 
 %% Averaging loop 
 for i=1:length(GNSS_info.acqInformationMeasurements)
@@ -33,8 +34,8 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
         acq_info.flags.constellations.gpsL1        	=   0;
         acq_info.flags.constellations.gpsL5        	=   0;
         acq_info.flags.constellations.Galileo    	=   1;
-        acq_info.flags.constellations.galE1    	=   0;
-        acq_info.flags.constellations.galE5a   	=   1;
+        acq_info.flags.constellations.galE1         =   0;
+        acq_info.flags.constellations.galE5a        =   1;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;
@@ -80,7 +81,7 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
 
         %% Compute the PVT solution
         if( i == 1 )
-            [PVT, DOP, Corr, NS, error]             =   PVT_recLS_multiC(acq_info, eph,[PVT0.x; PVT0.y; PVT0.z; 0]);
+            [PVT, DOP, Corr, NS, error]             =   PVT_recLS_multiC(acq_info, eph,PVT0);
         else
             [PVT, DOP, Corr, NS, error]             =   PVT_recLS_multiC(acq_info, eph,PVT);
         end
@@ -131,7 +132,9 @@ end
     
     %% Return parameters
     av_results;
-    refLocation = acq_info.refLocation.XYZ;
+    PVT0        =   GNSS_info.refLocation.refLocationEcef;
+    PVT0        =   [PVT0.x; PVT0.y; PVT0.z];
+    refLocation =   PVT0;
 end
 
 %% Test code

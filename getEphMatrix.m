@@ -29,7 +29,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
             ephemerides(21, i)      =   GPS(i).keplerModel.toeS;
             ephemerides(22, i)      =   GPS(i).tgdS;
         end
-        eph.GPSL1 = ephemerides;
+        eph.gpsL1 = ephemerides;
 
         GPS         =   SVinfo.gpsSatellites.gpsL5;
         ephemerides     =   zeros(22, length(GPS));
@@ -58,7 +58,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
             ephemerides(21, i)      =   GPS(i).keplerModel.toeS;
             ephemerides(22, i)      =   GPS(i).tgdS;
         end
-        eph.GPSL5 = ephemerides;
+        eph.gpsL5 = ephemerides;
     end
 
 
@@ -92,7 +92,7 @@ function eph    =   getEphMatrix(SVinfo, flags)
             ephemerides(21, i)      =   Galileo(i).keplerModel.toeS;
             ephemerides(22, i)      =   Galileo(i).tgdS;
         end
-        eph.GalileoE1 = ephemerides;
+        eph.galE1 = ephemerides;
 
         Galileo         =   SVinfo.galSatellites.galE5a;
         ephemerides     =   zeros(22, length(Galileo));
@@ -121,6 +121,6 @@ function eph    =   getEphMatrix(SVinfo, flags)
             ephemerides(21, i)      =   Galileo(i).keplerModel.toeS;
             ephemerides(22, i)      =   Galileo(i).tgdS;
         end
-        eph.GalileoE5a = ephemerides;
+        eph.galE5a = ephemerides;
     end
 end

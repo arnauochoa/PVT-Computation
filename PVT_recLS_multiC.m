@@ -260,7 +260,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                             Galileo_eph         =   Galileo_eph1;
                         end
                     end
-                    [Galileo_X(:, sat), Galileo_tcorr(sat)]  =   getCtrl_corr(Galileo_eph, Galileo_svn(sat), acq_info.TOW, Galileo_pr(sat));
+                    [Galileo_X(:, sat), Galileo_tcorr(sat)]  =   getCtrl_corr(Galileo_eph, Galileo_svn(sat), acq_info.tow, Galileo_pr(sat));
                 end
                 Galileo_corr                =   c * Galileo_tcorr(sat);
                 
@@ -268,7 +268,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                 
                 % Ionosphere and troposphere corrections
                 if acq_info.flags.corrections.ionosphere || acq_info.flags.corrections.troposphere
-                    [Galileo_tropoCorr, Galileo_ionoCorr]           =   getProp_corr(Galileo_X(:, sat), PVT, iono, acq_info.TOW);  % Iono + Tropo correction
+                    [Galileo_tropoCorr, Galileo_ionoCorr]           =   getProp_corr(Galileo_X(:, sat), PVT, iono, acq_info.tow);  % Iono + Tropo correction
                     if acq_info.flags.corrections.troposphere 
                         Galileo_corr            =   Galileo_corr - Galileo_tropoCorr; % troposphere correction
                     end
@@ -411,7 +411,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                   
                     
 %             end
-            PVT(1:3)    =   PVT(1:3) + d(1:3)';  % Update the PVT coords.
+            PVT(1:3)    =   PVT(1:3) + d(1:3);  % Update the PVT coords.
             PVT(4)      =   PVT(4) + d(4)/c;     % Update receiver clock offset
             %
             GDOP            =   sqrt(H(1,1) + H(2,2) + H(3,3) + H(4,4));
@@ -422,12 +422,25 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
             Corr.Galileo    =   [Galileo_ionoCorr Galileo_tropoCorr];
             NS              =   size(G, 1);
         else
-            error.flag = 1;
-            error.text = 'Not enough satellites';
-            PVT     =   [0 0 0 0];
-            DOP   	=   [];
-            Corr    =   [];
-            NS      =   0;
+            error.flag      =   1;
+            error.text      =   'Not enough satellites';
+            % De momento para salir del paso pongo que cuando no hay
+            % suficientes satelites en una iteracion que des como PVT la
+            % inicial. Pero esto creo que solo se deberia mirar 1 vez y si
+            % en la primera iteracion ya no hay satelites salir de la
+            % funcion.
+            % Si poneis todo 0's que sea [0;0;0;0] para que en las
+            % siguientes "epocas" no pete.
+            % Supongo que en Java lo de las dimensiones esta controlado y
+            % por eso no ha petado, pero MIRAD SI AHI PONES TAMBIEN QUE SI
+            % SI NO HAY SATS LA PVT = 0's ENTONCES UNA DE LAS PVT's (O
+            % VARIAS) SON 0's Y POR LO TANTO A LA HORA DE HACER EL PROMEDIO
+            % ESO SE DESBIA ... No creo que por esto se obtengan errores
+            % tan grandes
+            PVT             =   PVT0;%[0 0 0 0];
+            DOP             =   [];
+            Corr            =   [];
+            NS              =   0;
         end
         %
     end
