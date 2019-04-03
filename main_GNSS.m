@@ -30,12 +30,12 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
         c           =   299792458;       %   Speed of light (m/s)
 
         %% Hardcoded for testing (in order not to modify the files directly)
-        acq_info.flags.constellations.GPS           =   0;
-        acq_info.flags.constellations.gpsL1        	=   0;
-        acq_info.flags.constellations.gpsL5        	=   0;
-        acq_info.flags.constellations.Galileo    	=   1;
+        acq_info.flags.constellations.GPS           =   1;
+        acq_info.flags.constellations.gpsL1        	=   1;
+        acq_info.flags.constellations.gpsL5        	=   1;
+        acq_info.flags.constellations.Galileo    	=   0;
         acq_info.flags.constellations.galE1         =   0;
-        acq_info.flags.constellations.galE5a        =   1;
+        acq_info.flags.constellations.galE5a        =   0;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;

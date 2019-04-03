@@ -80,7 +80,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                 %% GPS corrections
                 % GPS satellite coordinates and time correction (always applying)
                 if (iter == 1)
-                    [GPS_X(:, sat), GPS_tcorr(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.TOW, GPS_pr(sat));
+                    [GPS_X(:, sat), GPS_tcorr(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.tow, GPS_pr(sat));
                 end
                 GPS_corr                =   c * GPS_tcorr(sat);
                 
@@ -88,7 +88,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                 
                 % Ionosphere and troposphere corrections
                 if acq_info.flags.corrections.ionosphere || acq_info.flags.corrections.troposphere
-                    [GPS_tropoCorr, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, acq_info.TOW);  % Iono + Tropo correction
+                    [GPS_tropoCorr, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, acq_info.tow);  % Iono + Tropo correction
                     if acq_info.flags.corrections.troposphere 
                         GPS_corr            =   GPS_corr - GPS_tropoCorr; % troposphere correction
                     end
@@ -120,7 +120,8 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
 %                 end
                             
                 % Corrections application
-                tmp         =   find(ncomm == GPS_svn(sat),1);
+%                 tmp         =   find(ncomm == GPS_svn(sat),1);
+                tmp         =   1; % Por ahora utilizo esto, REVISAR cuando se aplique 2freq
                 if( ~isempty(tmp) )
                     GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
                 end
