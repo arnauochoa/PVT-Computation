@@ -11,14 +11,6 @@ function    [I,ncomm]     =   getIonoCorrDualFreq(band1, band2, pr1, pr2)
 %           - I:        Ionosphere correction at band 2 using band 1
 %                       measurements
 
-%%
-
-% if size(pr1, 1) > size(pr5, 1)
-%     pr5c = zeros(1, size(pr1, 1));
-% else
-%     pr1c = zeros(1, size(pr5, 1));
-% end
-
 %% General algorithm, correction for band2
 tmp     =   (band1^2)/( (band2^2) - (band1^2)); 
 

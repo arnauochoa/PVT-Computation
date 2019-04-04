@@ -28,22 +28,25 @@ for i=1:length(GNSS_info)
         c           =   299792458;       %   Speed of light (m/s)
 
         %% Hardcoded for testing (in order not to modify the files directly)
-        acq_info.flags.constellations.GPS           =   1;
-        acq_info.flags.constellations.GPSL1        	=   1;
+        acq_info.flags.constellations.GPS           =   0;
+        acq_info.flags.constellations.GPSL1        	=   0;
         acq_info.flags.constellations.GPSL5        	=   0;
-        acq_info.flags.constellations.Galileo    	=   0;
+        acq_info.flags.constellations.Galileo    	=   1;
         acq_info.flags.constellations.GalileoE1    	=   0;
-        acq_info.flags.constellations.GalileoE5a   	=   0;
+        acq_info.flags.constellations.GalileoE5a   	=   1;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;
         acq_info.flags.algorithm.WLS                =   0;
-        acq_info.flags.corrections.f2corr           =   1;
+        acq_info.flags.corrections.f2corr           =   0;
         
         % Mask config
-        acq_info.flags.algorithm.mask.flag        	=   0;
-        acq_info.flags.algorithm.mask.type        	=   [1];
-        acq_info.flags.algorithm.mask.value        	=   [30];
+        acq_info.flags.algorithm.mask.flag        	=   1;
+        acq_info.flags.algorithm.mask.elev       	=   1;
+        acq_info.flags.algorithm.mask.CN0           =   1;
+        acq_info.flags.algorithm.mask.CN0value     	=   10;
+        acq_info.flags.algorithm.mask.elevvalue    	=   15;
+        acq_info.flags.algorithm.weight.type        =   3;
 
         if acq_info.flags.constellations.GPS
             system  =   'GPS';
@@ -57,14 +60,13 @@ for i=1:length(GNSS_info)
             system   =   'GPS + Galileo';
         end
 
-        %% Masks application
-%         if acq_info.flags.algorithm.mask.flag
-%             for z=1:length(acq_info.flags.algorithm.mask.type)
-%                 maskType    =   acq_info.flags.algorithm.mask.type(z);
-%                 maskValue   =   acq_info.flags.algorithm.mask.value(z);
-%                 acq_info    =   apply_mask(acq_info, maskType, maskValue);
-%             end
-%         end
+        %% CN0 mask application
+        if acq_info.flags.algorithm.mask.flag
+            if acq_info.flags.algorithm.mask.CN0
+                maskValue   =   acq_info.flags.algorithm.mask.CN0value;
+                acq_info    =   apply_mask(acq_info, 2, maskValue);
+            end
+        end
 
         %% It is needed to download a navigation message to obtain ephemerides
         % since they nav_msg is not always available

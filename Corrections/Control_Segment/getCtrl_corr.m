@@ -1,4 +1,4 @@
-function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
+function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr, flags, system_control)
 % getSatPos_tcorr:  Get satellite coordinates and clock correction.  
 %
 % Inputs:
@@ -18,6 +18,8 @@ function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
 
     %
     c           =   299792458;          %   Speed of light (m/s)
+    E1          =   1575.42e6;          %   L1/E1 freq [Hz]
+    E5a         =   1176.45e6;          %   L5/E5a freq [Hz]
     %-  Get satellite coordinates and clock corrections
     tx_RAW      =   TOW - pr/c;         %   1st guess of Tx time
     %       
@@ -27,14 +29,22 @@ function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
     %--     Get clock corrections
     tcorr       =   sat_clock_error_correction(tx_RAW, eph(:, col));
     tgd         =   eph(22, col);
-    tcorr       =   tcorr - tgd;        %   Correct the total Group Delay (TGD)
+    if system_control
+        tcorr       =   tcorr - tgd;        %   Correct the total Group Delay (TGD)
+    else
+        if flags.constellations.GalileoE5a
+            tcorr       = tcorr - tgd*(E1/E5a)^2;
+        else
+            tcorr       =   tcorr - tgd;  
+        end
+    end
     tx_GPS      =   tx_RAW-tcorr;       %   Correct the Tx time
     %--     Compute again the clock bias
     tcorr       =   sat_clock_error_correction(tx_GPS, eph(:, col));
     tcorr       =   tcorr - tgd;    
     %
     %-  Get satellite coordinates (corrected) and velocity
-    [X, vel]     =   satpos(tx_GPS, eph(:, col));    
+    [X, vel]     =   satpos(tx_GPS, eph(:, col), system_control);    
     %
     %--     Get the satellite relativistic clock correction
     trel        =   -2 * ( dot(X, vel) / (c^2) ); % IS-GPS-200E, p. 86
