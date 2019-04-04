@@ -1850,25 +1850,28 @@ function json_fn = getJSONfn(option)
             json_fn         =   'New_Test/Galileo E1/GAL_E1_12.txt';
         case 922
             json_fn         =   'New_Test/Galileo E1/GAL_E1_13.txt';
-% GALILEO E5a
+% GALILEO E1
         case 923
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_1.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_3.txt';
         case 924
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_2.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_4.txt';
         case 925
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_3.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_5.txt';
         case 926
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_4.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_6.txt';
         case 927
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_5.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_7.txt';
         case 928
-            json_fn         =   'New_Test/Galileo E5a/GAL_E5a_6.txt';
-% GPS L1
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_8.txt';
         case 929
-            json_fn         =   'New_Test/GPS L1/GPS_L1_1.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_9.txt';
         case 930
-            json_fn         =   'New_Test/GPS L1/GPS_L1_2.txt';
-        case 931
-            json_fn         =   'New_Test/GPS L1/GPS_L1_3.txt';
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_10.txt';
+        case 920
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_11.txt';
+        case 921
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_12.txt';
+        case 922
+            json_fn         =   'New_Test/Galileo E1/GAL_E1_13.txt';
     end
 end

@@ -134,7 +134,7 @@ end
     av_results;
     PVT0        =   GNSS_info.refLocation.refLocationEcef;
     PVT0        =   [PVT0.x; PVT0.y; PVT0.z];
-    refLocation =   PVT0;
+    refLocation =   [GNSS_info.refLocation.refLocationLla.latitude GNSS_info.refLocation.refLocationLla.longitude GNSS_info.refLocation.refLocationLla.altitude]; 
 end
 
 %% Test code
