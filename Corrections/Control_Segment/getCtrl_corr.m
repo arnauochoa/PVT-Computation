@@ -1,4 +1,4 @@
-function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
+function    [X, tcorr,tgd]   =   getCtrl_corr(eph, svn, TOW, pr)
 % getSatPos_tcorr:  Get satellite coordinates and clock correction.  
 %
 % Inputs:
@@ -27,11 +27,11 @@ function    [X, tcorr]   =   getCtrl_corr(eph, svn, TOW, pr)
     %--     Get clock corrections
     tcorr       =   sat_clock_error_correction(tx_RAW, eph(:, col));
     tgd         =   eph(22, col);
-    tcorr       =   tcorr - tgd;        %   Correct the total Group Delay (TGD)
+%     tcorr       =   tcorr - tgd;        %   Correct the total Group Delay (TGD)
     tx_GPS      =   tx_RAW-tcorr;       %   Correct the Tx time
     %--     Compute again the clock bias
     tcorr       =   sat_clock_error_correction(tx_GPS, eph(:, col));
-    tcorr       =   tcorr - tgd;    
+%     tcorr       =   tcorr - tgd;    
     %
     %-  Get satellite coordinates (corrected) and velocity
     [X, vel]     =   satpos(tx_GPS, eph(:, col));    

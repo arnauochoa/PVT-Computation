@@ -26,7 +26,76 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
     error.flag          =   0;
     error.text          =   '';
     e_t                 =   0;
-    
+    % GPS init
+    if acq_info.flags.constellations.GPS
+        if acq_info.flags.constellations.gpsL1
+            [prt,svnt,CN0t]     =   getMeas(acq_info.satellites.gpsSatellites.gpsL1);
+            GPS.L1.pr           =   prt;
+            GPS.L1.svn          =   svnt;
+            GPS.L1.cn0          =   CN0t;
+            GPS.L1.eph          =   eph.gpsL1;
+            GPS.L1.f            =   1575.42e6;
+        end
+        if acq_info.flags.constellations.gpsL5
+            [prt,svnt,CN0t]     =   getMeas(acq_info.satellites.gpsSatellites.gpsL5);
+            GPS.L5.pr           =   prt;
+            GPS.L5.svn          =   svnt;
+            GPS.L5.cn0          =   CN0t;
+            GPS.L5.eph          =   eph.gpsL5;
+            GPS.L5.f            =   1176.45e6;
+        end
+        flg             =   acq_info.flags.constellations.gpsL1 && acq_info.flags.constellations.gpsL5;
+        % (Yo creo que esta parte del codigo , lo de arriba,
+        %  deberia estar fuera de esta funcion y aqui pasar
+        % este tipo de estructuras, es decir, primero definis
+        % estucturas de constelacion/bandas y ah? dentro meteis
+        % medidas. Con estas estructuras llamais a la funcion LS)
+        if flg % If both L1 and L5 signals selected
+            [GPS,idx]  =   get2freqMeas(GPS);
+            if acq_info.flags.corrections.f2corr % if 2freq iono corrections selected
+                % Yo aplicaria correcciones a L5 ya que si hay 2freqs es el
+                % pseudorango que se utiliza
+                iono2freq       =   getiono2freqCorr_Dani(GPS.L5,GPS.L1); % Cambiar nombre...
+                tmp             =   zeros(GPS.nsat,1);
+                GPS.ionoCorr(1:length(iono2freq))   =   iono2freq;
+                %%% SEGUID DESDE AQUI
+                % Ahora teneis un vector de correcciones de iono con
+                % algunos valores de los pseudorangos que hay L1/L5 y el
+                % resto a 0. Lo que hay que hacer cuando entreis en el
+                % algoritmo propiamente dicho haceis el procesado normal
+                % aplicando las correcciones que normalmente aplicais y a
+                % la hora de aplicar la correcion de iono lo que hay que
+                % hacer es controlar si en la posicion del satelite que
+                % toca el GPS.ionoCorr(sat) == 0, si lo es aplicais
+                % correciones de Klobuchar, si no, aplicais
+                % GPS.ionoCorr(sat).
+                
+                
+                
+                 
+            end
+            
+        else
+            
+        end
+    end
+%     % GAL init
+%     if acq_info.flags.constellations.GAL
+%         if acq_info.flags.constellations.galE1
+%             [prt,svnt,CN0t]     =   getMeas(acq_info.satellites.galSatellites.galE1);
+%             GPS.L1.pr           =   prt;
+%             GPS.L1.svn          =   svnt;
+%             GPS.L1.cn0          =   CN0t;
+%             GPS.L1.eph          =   eph.galE1;
+%         end
+%         if acq_info.flags.constellations.galE5
+%             [prt,svnt,CN0t]     =   getMeas(acq_info.satellites.gpsSatellites.gpsL5);
+%             GPS.L5.pr           =   prt;
+%             GPS.L5.svn          =   svnt;
+%             GPS.L5.cn0          =   CN0t;
+%             GPS.L5.eph          =   eph.gpsL5;
+%         end
+%     end
     %% LS loop
     for iter = 1:Nit
 %         iter
@@ -80,7 +149,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph,PVT0
                 %% GPS corrections
                 % GPS satellite coordinates and time correction (always applying)
                 if (iter == 1)
-                    [GPS_X(:, sat), GPS_tcorr(sat)]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.tow, GPS_pr(sat));
+                    [GPS_X(:, sat), GPS_tcorr(sat),tgd]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.tow, GPS_pr(sat));
                 end
                 GPS_corr                =   c * GPS_tcorr(sat);
                 

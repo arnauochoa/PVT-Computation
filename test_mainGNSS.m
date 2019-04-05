@@ -18,7 +18,7 @@ for op=opmin:opmax
     
     %% Get JSON filename 
     json_fn = getJSONfn(op);
-    fprintf("File: %d", opCount);
+    fprintf('File: %d', opCount);
 
     %% Build str from JSON
     json            = strcat('JSON/', json_fn);
