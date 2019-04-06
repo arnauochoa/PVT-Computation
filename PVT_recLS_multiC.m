@@ -144,23 +144,44 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 
                 % Ionosphere correction based on dual frequency
                 if acq_info.flags.corrections.f2corr
-                    % De momento ok porque devuelve un vector de
-                    % correcciones
-                    if iter == 1
+                    if sat == 1
                         if acq_info.flags.constellations.GPSL1
-                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1176.45e6, 1575.42e6, [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p], [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p]); % correction for E1
-                        else
-                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq( 1575.42e6, 1176.45e6, -[acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p], -[acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p]); % correction for E5a
+                            % For L1 from L5
+                            [Pif,Ierr,Ierr2,ncomm]   =   getIonoCorrDualFreq_GPS(1575.42e6, 1176.45e6,...
+                                [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p],...
+                                [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p],...
+                                [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.tgdS]);
+                        end                      
+                        if acq_info.flags.constellations.GPSL5
+                            % For L5 from L1
+                            [Pif,Ierr,Ierr2,ncomm]   =   getIonoCorrDualFreq_GPS(1176.45e6, 1575.42e6,...
+                                [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.p],...
+                                [acq_info.SV.GPS.GPSL1.svid; acq_info.SV.GPS.GPSL1.p],...
+                                [acq_info.SV.GPS.GPSL5.svid; acq_info.SV.GPS.GPSL5.tgdS]);
                         end
-                        GPS_pr   =   GPS_pr - GPS_prcorr2f(sat) + c * GPS_tcorr(sat); 
+
+                        % Pseudorange - ionofree error
+                        temp     = ismember(GPS_svn,ncomm);
+                        idx      = find(temp);
+                        for oo = 1:length(Ierr)
+                            % Only substract ionofree error if it is
+                            % positive (else is because of noise)
+                            if Ierr(oo) > 0
+                                GPS_pr(idx(oo))   = GPS_pr(idx(oo)) - Ierr(oo); 
+                            end
+                        end
                     end
                 end
-                            
-                % Corrections application
-%                 tmp         =   find(ncomm == GPS_svn(sat),1);
-%                 if( ~isempty(tmp) )
-%                     GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
-%                 end
+                
+                % Applies Klobuchar to the satellites without ionofree
+                % correction
+                if acq_info.flags.corrections.f2corr
+                    if ~temp(sat)
+                        [~, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, acq_info.TOW);
+                    end
+                    GPS_corr            =   GPS_corr - GPS_ionoCorr;
+                end
+                
                 
                 GPS_pr_c                =   GPS_pr(sat) + GPS_corr - PVT(4)*c;
                 
@@ -313,29 +334,42 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info, eph)
                 
                 % Ionosphere correction based on dual frequency
                 if acq_info.flags.corrections.f2corr
-                    % De momento ok porque devuelve un vector de
-                    % correcciones
-                    if iter == 1
+                    if sat == 1
                         if acq_info.flags.constellations.GalileoE1
-                            [Galileo_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1176.45e6, 1575.42e6, [acq_info.SV.Galileo.GalileoE5a.svid; acq_info.SV.Galileo.GalileoE5a.p], [acq_info.SV.Galileo.GalileoE1.svid; acq_info.SV.Galileo.GalileoE1.p]); % correction for E1
-                        else
-                            [Galileo_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1575.42e6, 1176.45e6, -[acq_info.SV.Galileo.GalileoE1.svid; acq_info.SV.Galileo.GalileoE1.p], -[acq_info.SV.Galileo.GalileoE5a.svid; acq_info.SV.Galileo.GalileoE5a.p]); % correction for E5a
+                            % For E1 from E5a
+                            [Pif,Ierr,Ierr2,ncomm]   =   getIonoCorrDualFreq_GAL(1575.42e6, 1176.45e6,...
+                                [acq_info.SV.Galileo.GalileoE1.svid; acq_info.SV.Galileo.GalileoE1.p],...
+                                [acq_info.SV.Galileo.GalileoE5a.svid; acq_info.SV.Galileo.GalileoE5a.p]);
+                        end                      
+                        if acq_info.flags.constellations.GalileoE5a
+                            % For E5a from E1
+                            [Pif,Ierr,Ierr2,ncomm]   =   getIonoCorrDualFreq_GAL(1176.45e6, 1575.42e6,...
+                                [acq_info.SV.Galileo.GalileoE5a.svid; acq_info.SV.Galileo.GalileoE5a.p],...
+                                [acq_info.SV.Galileo.GalileoE1.svid; acq_info.SV.Galileo.GalileoE1.p]);
                         end
-                        Galileo_pr   =   Galileo_pr - Galileo_prcorr2f(sat) + c * Galileo_tcorr(sat); 
+                        
+                        % Pseudorange - ionofree error
+                        temp     = ismember(Galileo_svn,ncomm);
+                        idx      = find(temp);
+                        for oo = 1:length(Ierr)
+                            % Only substract ionofree error if it is
+                            % positive (else is because of noise)
+                            if Ierr(oo) > 0
+                                Galileo_pr(idx(oo))   = Galileo_pr(idx(oo)) - Ierr(oo); 
+                            end
+                        end
                     end
-%                     if acq_info.flags.constellations.GalileoE1
-%                         Galileo_prcorr2f                =   getIonoCorrDualFreq_2(pr1, pr5, f1, f5, TGD, const);
-%                     else
-%                         Galielo_prcorr2f                =   getIonoCorrDualFreq_2(pr1, pr5, f1, f5, TGD,const);
-%                     end
-%                     Galileo_corr                =   Galileo_corr - Galileo_prcorr2f;
+                end
+                
+                % Applies Klobuchar to the satellites without ionofree
+                % correction
+                if acq_info.flags.corrections.f2corr
+                    if ~temp(sat)
+                        [~, Galileo_ionoCorr]           =   getProp_corr(Galileo_X(:, sat), PVT, iono, acq_info.TOW);
+                    end
+                    Galileo_corr            =   Galileo_corr - Galileo_ionoCorr;
                 end
                             
-                % Corrections application
-%                 tmp         =   find(ncomm == Galileo_svn(sat),1);
-%                 if( ~isempty(tmp) )
-%                     Galileo_pr_c                =   Galileo_pr(sat) + Galileo_corr;   %   Corrected pseudorange
-%                 end
                 
                 % Corrections application
                 if(acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo) % if multiconstellation

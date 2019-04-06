@@ -27,21 +27,21 @@ for i=1:length(GNSS_info)
         PVT0        =   acq_info.refLocation.XYZ;  % Preliminary guess for PVT solution     
         c           =   299792458;       %   Speed of light (m/s)
 
-        %% Hardcoded for testing (in order not to modify the files directly)
+        %% Hardcoded for testing (in order not to modify the files directly)       
         acq_info.flags.constellations.GPS           =   0;
         acq_info.flags.constellations.GPSL1        	=   0;
         acq_info.flags.constellations.GPSL5        	=   0;
         acq_info.flags.constellations.Galileo    	=   1;
-        acq_info.flags.constellations.GalileoE1    	=   0;
-        acq_info.flags.constellations.GalileoE5a   	=   1;
-        acq_info.flags.corrections.ionosphere       =   1;
+        acq_info.flags.constellations.GalileoE1    	=   1;
+        acq_info.flags.constellations.GalileoE5a   	=   0;
+        acq_info.flags.corrections.ionosphere       =   0;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;
         acq_info.flags.algorithm.WLS                =   0;
         acq_info.flags.corrections.f2corr           =   0;
         
         % Mask config
-        acq_info.flags.algorithm.mask.flag        	=   1;
+        acq_info.flags.algorithm.mask.flag        	=   0;
         acq_info.flags.algorithm.mask.elev       	=   1;
         acq_info.flags.algorithm.mask.CN0           =   1;
         acq_info.flags.algorithm.mask.CN0value     	=   10;

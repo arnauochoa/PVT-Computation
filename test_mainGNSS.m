@@ -7,7 +7,7 @@ clear all
 clc;
 
 %% Choosing data  
-opmin   =   640;
+opmin   =   637;
 opmax	=   797;
 
 for op=opmin:opmax
