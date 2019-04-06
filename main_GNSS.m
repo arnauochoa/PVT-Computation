@@ -40,7 +40,7 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;
         acq_info.flags.algorithm.WLS                =   0;
-        acq_info.flags.corrections.f2corr           =   0;
+        acq_info.flags.corrections.f2corr           =   1;
         
         % Mask config
         acq_info.flags.algorithm.mask.flag        	=   0;

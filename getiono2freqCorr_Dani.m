@@ -18,7 +18,7 @@ function    [iono,i1]    =   getiono2freqCorr_Dani(L1,L5)
     [~,i1,i2]   =   intersect(svn1,svn2);
     %
     pr1         =   L1.pr(i1);
-    pr2         =   L2.pr(i2);
+    pr2         =   L5.pr(i2);
     %
     iono        =   fact*(pr1 - pr2);
 

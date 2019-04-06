@@ -1,4 +1,4 @@
-function    [Meas,svn2]   =   get2freqMeas(meas)
+function    [meas,svn2]   =   get2freqMeas(meas)
 % Outputs:
 %           Meas: Structure with mesures with 2freq; that is: as long as we
 %           have L5 measurements we use them if not L1 measurements are
@@ -26,19 +26,19 @@ function    [Meas,svn2]   =   get2freqMeas(meas)
     aa           =   setdiff(meas.L1.svn,meas.L5.svn);
     if(~isempty(aa))
        for ii = 1:length(aa)
-           ttt          =   [ttt aa(ii)];
-           pr           =   [pr meas.L1.pr(meas.L1.svn==aa(ii))];
-           CN0          =   [CN0 meas.L1.cn0(meas.L1.sv==aa(ii))];
+           ttt          =   [ttt;aa(ii)];
+           pr           =   [pr;meas.L1.pr(meas.L1.svn==aa(ii))];
+           CN0          =   [CN0;meas.L1.cn0(meas.L1.svn==aa(ii))];
        end
        N1           =   length(aa);
 %        eph_idx      =   [2*ones(N2,1);ones(N1,1)]; 
     else
 %        eph_idx      =   2*ones(N2,1); 
     end
-    Meas.nsat   =   length(pr);
-    Meas.pr     =   pr;
-    Meas.svn    =   ttt;
-    Meas.cn0    =   CN0;
+    meas.nsat   =   length(pr);
+    meas.pr     =   pr;
+    meas.svn    =   ttt;
+    meas.cn0    =   CN0;
 %     idx         =   id5;
 
 

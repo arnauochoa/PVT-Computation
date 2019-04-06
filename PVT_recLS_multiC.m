@@ -1,4 +1,4 @@
-function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
+function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,epht,PVT0)
 % PVT_recLS:    Computation of the receiver position at time TOW from  
 %               pseudoranges (pr) and ephemerides information (eph). 
 %               Implementation using the iterative Least-Squares principle 
@@ -37,26 +37,30 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
             GPS.L1.pr           =   prt;
             GPS.L1.svn          =   svnt;
             GPS.L1.cn0          =   CN0t;
-            GPS.L1.eph          =   eph.gpsL1;
+            GPS.L1.nsat         =   length(prt);
+            GPS.L1.eph          =   epht.gpsL1;
             GPS.L1.f            =   1575.42e6;
             %
             pr                  =   GPS.L1.pr;
             svn                 =   GPS.L1.svn;
             cn0                 =   GPS.L1.cn0;
             eph                 =   GPS.L1.eph;
+            Nsat                =   GPS.L1.nsat;
         end
         if acq_info.flags.constellations.gpsL5
             [prt,svnt,CN0t]     =   getMeas(acq_info.satellites.gpsSatellites.gpsL5);
             GPS.L5.pr           =   prt;
             GPS.L5.svn          =   svnt;
             GPS.L5.cn0          =   CN0t;
-            GPS.L5.eph          =   eph.gpsL5;
+            GPS.L5.nsat         =   length(prt);
+            GPS.L5.eph          =   epht.gpsL5;
             GPS.L5.f            =   1176.45e6;
             %
             pr                  =   GPS.L5.pr;
             svn                 =   GPS.L5.svn;
             cn0                 =   GPS.L5.cn0;
             eph                 =   GPS.L5.eph;
+            Nsat                =   GPS.L5.nsat;
         end
         flg             =   acq_info.flags.constellations.gpsL1 && acq_info.flags.constellations.gpsL5;
         % (Yo creo que esta parte del codigo , lo de arriba,
@@ -117,8 +121,6 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
                 [X(:,ii),tau,tgd]   =   getCtrl_corr(eph,svn(ii),acq_info.tow,pr(ii));
                 tcorr(ii)           =   tau - tgd;
             end
-                
-            
         else % Only L1 or L5 selected
             %
             % Get SatPos and SatClock corrections
@@ -131,7 +133,6 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
                 [X(:,ii),tau,tgd]   =   getCtrl_corr(eph,svn(ii),acq_info.tow,pr(ii));
                 tcorr(ii)           =   tau - tgd;
             end
-            
         end
     end
 %     % GAL init
@@ -153,12 +154,39 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
 %     end
     %% LS loop
     for iter = 1:Nit
-%         iter
-%         % Declarations
-%         if (iter == 1)
-%             PVT     =   PVT0;%[acq_info.refLocation.XYZ 0];
-%             iono    =   acq_info.ionoProto;
-%         end
+
+        [pd,A,tropoCorr,ionoCorr]   =   getMeasandState(acq_info,X,PVT,iono,ionoCorr,tcorr,pr);
+        % Delete rows of 0s (Esto para que es???)
+        if iter == 1
+            for i=1:size(A, 1)
+                if A(i,:) == 0
+                    emptysat = [emptysat i];
+                end
+            end
+            emptysat = emptysat(length(emptysat):-1:1);
+            for i=1:length(emptysat)
+               A(emptysat(i),:) = [];
+               pd(emptysat(i))   = [];
+            end
+        end
+        emptysat         = []; 
+        %
+        for ii = 1:length(p)
+            [~, eL(ii), ~]      =   topocent(PVT(1:3),X(:,ii));    % Satellite azimuth and elevation
+        end
+        %- Apply Mask -%
+        if  acq_info.flags.algorithm.mask.flag
+%             type        =   acq_info.flags.algorithm.mask.type;
+% De momento s?lo aplico por elevaci?n
+%
+            maskVal     =   acq_info.flags.algorithm.mask.value;
+            idx         =   eL > maskVal;
+            A       =   A(idx,:);
+            pd       =   pd(idx);
+            cn0     =   cn0(idx);
+%             Sat_X   =   Sat_X(idx,:);
+            eL      =   eL(idx);            
+        end  
         
         %% GPS loop
          if acq_info.flags.constellations.GPS
@@ -200,40 +228,40 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
 %                 end
 %             end
         
-            for sat = 1:nGPS                
+%             for sat = 1:Nsat                
                 %% GPS corrections
                 % GPS satellite coordinates and time correction (always applying)
-                if (iter == 1)
-                    [GPS_X(:, sat), GPS_tcorr(sat),tgd]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.tow, GPS_pr(sat));
-                end
+%                 if (iter == 1)
+%                     [GPS_X(:, sat), GPS_tcorr(sat),tgd]  =   getCtrl_corr(GPS_eph, GPS_svn(sat), acq_info.tow, GPS_pr(sat));
+%                 end
 %                 GPS_corr                =   c * GPS_tcorr(sat);
                 
                 % Another GPS corrections (depending on flags)
                 
-                % Ionosphere and troposphere corrections
-                if acq_info.flags.corrections.ionosphere || acq_info.flags.corrections.troposphere
-                    [GPS_tropoCorr, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, acq_info.tow);  % Iono + Tropo correction
-                    if acq_info.flags.corrections.troposphere 
-                        GPS_corr            =   GPS_corr - GPS_tropoCorr; % troposphere correction
-                    end
-                    if acq_info.flags.corrections.ionosphere
-                        GPS_corr            =   GPS_corr - GPS_ionoCorr; % ionosphere correction
-                    end
-                else
-                    
-                end
-                
-                % Ionosphere correction based on dual frequency
-                if acq_info.flags.corrections.f2corr
-%                     if iter == 1
-                        if acq_info.flags.constellations.gpsL1
-                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1176.45e6, 1575.42e6, [acq_info.satellites.gpsSatellites.gpsL5.svid; acq_info.satellites.gpsSatellites.gpsL5.pR], [acq_info.satellites.gpsSatellites.gpsL1.svid; acq_info.satellites.gpsSatellites.gpsL1.pR]); % correction for E1
-                        else
-                            [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq( 1575.42e6, 1176.45e6, -[acq_info.satellites.gpsSatellites.gpsL1.svid; acq_info.satellites.gpsSatellites.gpsL1.pR], -[acq_info.satellites.gpsSatellites.gpsL5.svid; acq_info.satellites.gpsSatellites.gpsL5.pR]); % correction for E5a
-                        end
-                        GPS_pr   =   GPS_pr - GPS_prcorr2f(sat) + c * GPS_tcorr(sat); 
+%                 % Ionosphere and troposphere corrections
+%                 if acq_info.flags.corrections.ionosphere || acq_info.flags.corrections.troposphere
+%                     [GPS_tropoCorr, GPS_ionoCorr]           =   getProp_corr(GPS_X(:, sat), PVT, iono, acq_info.tow);  % Iono + Tropo correction
+%                     if acq_info.flags.corrections.troposphere 
+%                         GPS_corr            =   GPS_corr - GPS_tropoCorr; % troposphere correction
 %                     end
-                end
+%                     if acq_info.flags.corrections.ionosphere
+%                         GPS_corr            =   GPS_corr - GPS_ionoCorr; % ionosphere correction
+%                     end
+%                 else
+%                     
+%                 end
+                
+%                 % Ionosphere correction based on dual frequency
+%                 if acq_info.flags.corrections.f2corr
+% %                     if iter == 1
+%                         if acq_info.flags.constellations.gpsL1
+%                             [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq(1176.45e6, 1575.42e6, [acq_info.satellites.gpsSatellites.gpsL5.svid; acq_info.satellites.gpsSatellites.gpsL5.pR], [acq_info.satellites.gpsSatellites.gpsL1.svid; acq_info.satellites.gpsSatellites.gpsL1.pR]); % correction for E1
+%                         else
+%                             [GPS_prcorr2f,ncomm]   =   getIonoCorrDualFreq( 1575.42e6, 1176.45e6, -[acq_info.satellites.gpsSatellites.gpsL1.svid; acq_info.satellites.gpsSatellites.gpsL1.pR], -[acq_info.satellites.gpsSatellites.gpsL5.svid; acq_info.satellites.gpsSatellites.gpsL5.pR]); % correction for E5a
+%                         end
+%                         GPS_pr   =   GPS_pr - GPS_prcorr2f(sat) + c * GPS_tcorr(sat); 
+% %                     end
+%                 end
 %                     if acq_info.flags.corrections.f2corr
 %                      	[GPS_prcorr2f GPS_phcorr2f GPS_idx]   =   getIonoCorrDualFreq(acq_info.satellites.GPS);
 % 
@@ -243,42 +271,42 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
 %                     end
 %                 end
                             
-                % Corrections application
-%                 tmp         =   find(ncomm == GPS_svn(sat),1);
-                tmp         =   1; % Por ahora utilizo esto, REVISAR cuando se aplique 2freq
-                if( ~isempty(tmp) )
-                    GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
-                end
-                
-                %% GPS geometric matrix generation
-                if (~isnan(GPS_pr_c))    % Fill as long as there is C1 measurement,
-                                     % otherwise discard the measurement.
-                    %--     Fill the measurement vector (rhoc_i - d0_i)
-                    GPS_d0  = sqrt((GPS_X(1,sat) - PVT(1))^2 + (GPS_X(2,sat) - PVT(2))^2 + (GPS_X(3,sat) - PVT(3))^2); %TODO: shorten
-                    GPS_p(sat)          =   GPS_pr_c - GPS_d0;
-                    %
-                    %--     Fill the geometry matrix (TBD)
-                    GPS_ax              =   -(GPS_X(1, sat) - PVT(1)) / GPS_d0;   % dx/d0
-                    GPS_ay              =   -(GPS_X(2, sat) - PVT(2)) / GPS_d0;   % dy/d0
-                    GPS_az              =   -(GPS_X(3, sat) - PVT(3)) / GPS_d0;   % dz/d0
-                    GPS_A(sat, 1:3)     =   [GPS_ax GPS_ay GPS_az];
-                    % 
-                end       
-            end
-            % Delete rows of 0s
-            if iter == 1
-                for i=1:size(GPS_A, 1)
-                    if GPS_A(i,:) == 0
-                        emptysat = [emptysat i];
-                    end
-                end
-                emptysat = emptysat(length(emptysat):-1:1);
-                for i=1:length(emptysat)
-                   GPS_A(emptysat(i),:) = [];
-                   GPS_p(emptysat(i))   = [];
-                end
-            end
-            emptysat         = []; 
+%                 % Corrections application
+% %                 tmp         =   find(ncomm == GPS_svn(sat),1);
+%                 tmp         =   1; % Por ahora utilizo esto, REVISAR cuando se aplique 2freq
+%                 if( ~isempty(tmp) )
+%                     GPS_pr_c                =   GPS_pr(sat) + GPS_corr;   %   Corrected pseudorange
+%                 end
+%                 
+%                 %% GPS geometric matrix generation
+%                 if (~isnan(GPS_pr_c))    % Fill as long as there is C1 measurement,
+%                                      % otherwise discard the measurement.
+%                     %--     Fill the measurement vector (rhoc_i - d0_i)
+%                     GPS_d0  = sqrt((GPS_X(1,sat) - PVT(1))^2 + (GPS_X(2,sat) - PVT(2))^2 + (GPS_X(3,sat) - PVT(3))^2); %TODO: shorten
+%                     GPS_p(sat)          =   GPS_pr_c - GPS_d0;
+%                     %
+%                     %--     Fill the geometry matrix (TBD)
+%                     GPS_ax              =   -(GPS_X(1, sat) - PVT(1)) / GPS_d0;   % dx/d0
+%                     GPS_ay              =   -(GPS_X(2, sat) - PVT(2)) / GPS_d0;   % dy/d0
+%                     GPS_az              =   -(GPS_X(3, sat) - PVT(3)) / GPS_d0;   % dz/d0
+%                     GPS_A(sat, 1:3)     =   [GPS_ax GPS_ay GPS_az];
+%                     % 
+%                 end       
+%             end
+%             % Delete rows of 0s
+%             if iter == 1
+%                 for i=1:size(GPS_A, 1)
+%                     if GPS_A(i,:) == 0
+%                         emptysat = [emptysat i];
+%                     end
+%                 end
+%                 emptysat = emptysat(length(emptysat):-1:1);
+%                 for i=1:length(emptysat)
+%                    GPS_A(emptysat(i),:) = [];
+%                    GPS_p(emptysat(i))   = [];
+%                 end
+%             end
+%             emptysat         = []; 
         else
             GPS_A           =   [];
             GPS_X           =   [];
@@ -458,7 +486,7 @@ function    [PVT, DOP, Corr, NS, error]  =   PVT_recLS_multiC(acq_info,eph,PVT0)
         % Add multiconstellation column
         if iter == 1
             if acq_info.flags.constellations.GPS && acq_info.flags.constellations.Galileo
-                GPS_A       =   [GPS_A zeros(size(GPS_A, 1), 1)];
+                GPS_A       =   [A zeros(size(A, 1), 1)];
                 Galileo_A   =   [Galileo_A ones(size(Galileo_A, 1), 1)];
                 
             end
