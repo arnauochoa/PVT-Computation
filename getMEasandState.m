@@ -1,5 +1,7 @@
-function [pd,A,tropoCorr,ionoCorr] = getMEasandState(acq_info,X,PVT,iono,ionoCorr,tcorr,pr)
+function [pd,A,tropoCorr,ionoCorr] = getMeasandState(acq_info,X,PVT,iono,ionoCorr,tcorr,pr)
 
+    c               =   299792458;
+    Nsat            =   length(pr);
     tropoCorr       =   zeros(Nsat,1);
     pd              =   zeros(Nsat,1);
     A               =   zeros(Nsat,3);
