@@ -1,4 +1,4 @@
-function [satp,satv]    =   satpos(t,eph)
+function [satp,satv]    =   satpos(t,eph,str)
 %SATPOS   Calculation of X,Y,Z coordinates and velocity at time t
 %         for given ephemeris eph
 
@@ -6,7 +6,13 @@ function [satp,satv]    =   satpos(t,eph)
 %Copyright (c) by Kai Borre
 %$Revision: 1.0 $  $Date: 1997/09/26  $
 
-GM = 3.986008e14;             % earth's universal gravitational
+if strcmp(str,'GPS')
+    GM  =   3.986008e14;             % earth's universal gravitational
+    % GM = 3.986008e14;
+else
+    GM  =   3.986004418e14;
+end
+%        
 % parameter m^3/s^2
 Omegae_dot = 7.2921151467e-5; % earth rotation rate, rad/s
 %

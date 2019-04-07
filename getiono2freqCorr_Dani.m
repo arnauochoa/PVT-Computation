@@ -11,7 +11,7 @@ function    [iono,i1]    =   getiono2freqCorr_Dani(L1,L5)
 
     f1      =   L1.f;
     f2      =   L5.f;
-    fact    =   (f2^2)/((f2^2)-(f1^2));
+    fact    =   (f2^2)/((f1^2)-(f2^2));
     %
     svn1    =   L1.svn;
     svn2    =   L5.svn;
@@ -20,6 +20,6 @@ function    [iono,i1]    =   getiono2freqCorr_Dani(L1,L5)
     pr1         =   L1.pr(i1);
     pr2         =   L5.pr(i2);
     %
-    iono        =   fact*(pr1 - pr2);
+    iono        =   fact*(pr2 - pr1);
 
 end

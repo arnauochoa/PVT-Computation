@@ -1,4 +1,4 @@
-function    [X, tcorr,tgd]   =   getCtrl_corr(eph, svn, TOW, pr)
+function    [X, tcorr,tgd]   =   getCtrl_corr(eph, svn, TOW, pr,str)
 % getSatPos_tcorr:  Get satellite coordinates and clock correction.  
 %
 % Inputs:
@@ -34,7 +34,7 @@ function    [X, tcorr,tgd]   =   getCtrl_corr(eph, svn, TOW, pr)
 %     tcorr       =   tcorr - tgd;    
     %
     %-  Get satellite coordinates (corrected) and velocity
-    [X, vel]     =   satpos(tx_GPS, eph(:, col));    
+    [X, vel]     =   satpos(tx_GPS, eph(:, col),str);    
     %
     %--     Get the satellite relativistic clock correction
     trel        =   -2 * ( dot(X, vel) / (c^2) ); % IS-GPS-200E, p. 86

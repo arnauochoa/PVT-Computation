@@ -1870,5 +1870,32 @@ function json_fn = getJSONfn(option)
             json_fn         =   'New_Test/GPS L1/GPS_L1_2.txt';
         case 931
             json_fn         =   'New_Test/GPS L1/GPS_L1_3.txt';
+            %
+        case 932
+            json_fn         =   'test 5 modos 7 minutos/acq_info_1.txt';
+        case 933
+            json_fn         =   'test 5 modos 7 minutos/acq_info_2.txt';
+        case 934
+            json_fn         =   'test 5 modos 7 minutos/acq_info_3.txt';
+        case 935
+            json_fn         =   'test 5 modos 7 minutos/acq_info_4.txt';
+        case 936
+            json_fn         =   'test 5 modos 7 minutos/acq_info_5.txt';
+        case 937
+            json_fn         =   'test 5 modos 7 minutos/acq_info_6.txt';
+        case 938
+            json_fn         =   'test 5 modos 7 minutos/acq_info_7.txt';
+        case 939
+            json_fn         =   'test 5 modos 7 minutos/acq_info_8.txt';
+        case 940
+            json_fn         =   'test 5 modos 7 minutos/acq_info_9.txt';
+        case 941
+            json_fn         =   'test 5 modos 7 minutos/acq_info_10.txt';
+        case 942
+            json_fn         =   'test 5 modos 7 minutos/acq_info_11.txt';
+        case 943
+            json_fn         =   'test 5 modos 7 minutos/acq_info_12.txt';
+        case 944
+            json_fn         =   'test 5 modos 7 minutos/acq_info_13.txt';
     end
 end

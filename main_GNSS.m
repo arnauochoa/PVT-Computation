@@ -30,12 +30,12 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
         c           =   299792458;       %   Speed of light (m/s)
 
         %% Hardcoded for testing (in order not to modify the files directly)
-        acq_info.flags.constellations.GPS           =   1;
+        acq_info.flags.constellations.GPS           =   0;
         acq_info.flags.constellations.gpsL1        	=   1;
         acq_info.flags.constellations.gpsL5        	=   1;
-        acq_info.flags.constellations.Galileo    	=   0;
-        acq_info.flags.constellations.galE1         =   0;
-        acq_info.flags.constellations.galE5a        =   0;
+        acq_info.flags.constellations.Galileo    	=   1;
+        acq_info.flags.constellations.galE1         =   1;
+        acq_info.flags.constellations.galE5a        =   1;
         acq_info.flags.corrections.ionosphere       =   1;
         acq_info.flags.corrections.troposphere      =   1;
         acq_info.flags.algorithm.LS                 =   1;
@@ -81,9 +81,9 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
 
         %% Compute the PVT solution
         if( i == 1 )
-            [PVT, DOP, Corr, NS, error]             =   PVT_recLS_multiC(acq_info, eph,PVT0);
+            [PVT,DOP,GPS,GAL,NS,error]             =   PVT_recLS_multiC(acq_info,eph,PVT0);
         else
-            [PVT, DOP, Corr, NS, error]             =   PVT_recLS_multiC(acq_info, eph,PVT);
+            [PVT,DOP,GPS,GAL,NS,error]             =   PVT_recLS_multiC(acq_info, eph,PVT);
         end
 
         if error.flag
@@ -99,7 +99,9 @@ for i=1:length(GNSS_info.acqInformationMeasurements)
             results(i, j, 5:7)   	=   DOP;   
 
             % Corr
-            results(i, j, 8:11)      =   [Corr.GPS Corr.Galileo];
+            %- Check how to get these measurements
+            % GPS/GAL.ionoCorr and GPS/GAL.tropoCorr
+%             results(i, j, 8:11)      =   [Corr.GPS Corr.Galileo];
             
             % Sat number
             results(i, j, 12)      =   NS;

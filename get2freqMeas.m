@@ -17,9 +17,9 @@ function    [meas,svn2]   =   get2freqMeas(meas)
     if(N2 ~= length(meas.L5.svn))
         aa          =   setdiff(meas.L5.svn,meas.L1.svn);
         for ii =1:length(aa) 
-            ttt     =   [ttt aa(ii)];
-            pr      =   [pr meas.L5.pr(meas.L5.svn==aa(ii))];
-            CN0     =   [CN0 meas.L5.cn0(meas.L5.sv==aa(ii))];
+            ttt     =   [ttt;aa(ii)];
+            pr      =   [pr;meas.L5.pr(meas.L5.svn==aa(ii))];
+            CN0     =   [CN0;meas.L5.cn0(meas.L5.svn==aa(ii))];
         end
         N2       =   length(ttt);
     end

@@ -8,7 +8,7 @@ clc;
 
 %% Choosing data      GPS 1     GAL E5a     GAL E1 
 opmin   =   910;%      929        923        910            637;%646;
-opmax	=   922;%      931        928        922            797;%698;
+opmax	=   928;%      931        928        922            797;%698;
 
 latLongs = [];
 opCount = 1;
